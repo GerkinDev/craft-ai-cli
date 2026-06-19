@@ -3,7 +3,7 @@ import json
 
 import click
 
-from utils.utils import CliContext, parse_payload
+from utils import CliContext, parse_payload
 
 @click.group()
 def deployments():

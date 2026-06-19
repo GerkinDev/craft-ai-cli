@@ -4,7 +4,7 @@ from craft_ai_sdk import CraftAiSdk
 from cli.executions import executions
 from cli.deployments import deployments
 from cli.pipelines import pipelines
-from utils.utils import CliContext
+from utils import CliContext
 
 @click.group()
 @click.option('--control-url', help="Control URL")

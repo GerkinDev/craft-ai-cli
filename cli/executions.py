@@ -3,7 +3,7 @@ import json
 
 import click
 
-from utils.utils import CliContext
+from utils import CliContext
 
 @click.group()
 def executions():
