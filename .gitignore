@@ -1,0 +1,24 @@
+# Python
+__pycache__
+.ipynb_checkpoints
+.pytest_cache
+
+# pyenv
+.python-version
+
+# ruff
+.ruff_cache
+
+# Environments
+.env.*
+.env
+
+# Build
+dist
+*.bak
+
+# VsCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/*.shared.json
+!.vscode/tasks/**
