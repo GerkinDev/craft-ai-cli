@@ -25,7 +25,7 @@ def create(ctx: CliContext, name: str, pipeline_name: str, description: str | No
     
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].create_deployment(deployment_name=name, pipeline_name=pipeline_name, description=description, mode=mode,execution_rule=rule, schedule=schedule)
+        result = ctx.obj.sdk_instance.create_deployment(deployment_name=name, pipeline_name=pipeline_name, description=description, mode=mode,execution_rule=rule, schedule=schedule)
         click.echo(f"Deployment '{name}' created successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
@@ -39,7 +39,7 @@ def get(ctx: CliContext, name: str):
     
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].get_deployment(name)
+        result = ctx.obj.sdk_instance.get_deployment(name)
         click.echo(f"Deployment '{name}' retrieved successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
@@ -53,7 +53,7 @@ def delete(ctx: CliContext, name: str):
     
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].delete_deployment(name)
+        result = ctx.obj.sdk_instance.delete_deployment(name)
         click.echo(f"Deployment '{name}' deleted successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
@@ -66,7 +66,7 @@ def logs(ctx: CliContext, name: str):
     """Get the logs of a deployment"""
     
     # Call SDK
-    result = ctx.obj['sdk_instance'].get_deployment_logs(name)
+    result = ctx.obj.sdk_instance.get_deployment_logs(name)
     click.echo(json.dumps(result, indent=2))
 
 @deployments.command()
@@ -83,7 +83,7 @@ def trigger(ctx: CliContext, name: str, payload: str | None):
     
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].trigger_endpoint(name)
+        result = ctx.obj.sdk_instance.trigger_endpoint(name)
         click.echo(f"Deployment '{name}' triggered successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:

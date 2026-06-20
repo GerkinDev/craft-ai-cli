@@ -78,7 +78,7 @@ def create(
 
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].create_pipeline(
+        result = ctx.obj.sdk_instance.create_pipeline(
             pipeline_name=name,
             function_path=function_path,
             function_name=function_name,
@@ -102,7 +102,7 @@ def delete(ctx: CliContext, name: str, force_deployments_deletion: bool):
 
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].delete_pipeline(name,force_deployments_deletion=force_deployments_deletion)
+        result = ctx.obj.sdk_instance.delete_pipeline(name,force_deployments_deletion=force_deployments_deletion)
         click.echo(f"Pipeline '{name}' deleted successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
@@ -116,7 +116,7 @@ def get(ctx: CliContext, name: str):
 
     # Call SDK
     try:
-        result = ctx.obj['sdk_instance'].get_pipeline(name)
+        result = ctx.obj.sdk_instance.get_pipeline(name)
         click.echo(f"Pipeline '{name}' retrieved successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
