@@ -24,5 +24,5 @@ def list(ctx: CliContext, deployment: str | None):
         result = ctx.obj.sdk_instance.list_pipeline_executions(pipeline_name)
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 

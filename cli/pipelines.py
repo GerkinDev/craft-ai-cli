@@ -91,7 +91,7 @@ def create(
         click.echo(f"Pipeline '{name}' created successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
 @pipelines.command()
 @click.argument('name', required=True)
@@ -106,7 +106,7 @@ def delete(ctx: CliContext, name: str, force_deployments_deletion: bool):
         click.echo(f"Pipeline '{name}' deleted successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
 @pipelines.command()
 @click.argument('name', required=True)
@@ -120,7 +120,7 @@ def get(ctx: CliContext, name: str):
         click.echo(f"Pipeline '{name}' retrieved successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
 @pipelines.command()
 @click.argument('name', required=True)

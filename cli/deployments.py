@@ -29,7 +29,7 @@ def create(ctx: CliContext, name: str, pipeline_name: str, description: str | No
         click.echo(f"Deployment '{name}' created successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
 @deployments.command()
 @click.argument('name', required=True)
@@ -43,7 +43,7 @@ def get(ctx: CliContext, name: str):
         click.echo(f"Deployment '{name}' retrieved successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
 @deployments.command()
 @click.argument('name', required=True)
@@ -57,7 +57,7 @@ def delete(ctx: CliContext, name: str):
         click.echo(f"Deployment '{name}' deleted successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
 @deployments.command()
 @click.argument('name', required=True)
@@ -66,8 +66,11 @@ def logs(ctx: CliContext, name: str):
     """Get the logs of a deployment"""
     
     # Call SDK
-    result = ctx.obj.sdk_instance.get_deployment_logs(name)
-    click.echo(json.dumps(result, indent=2))
+    try:
+        result = ctx.obj.sdk_instance.get_deployment_logs(name)
+        click.echo(json.dumps(result, indent=2))
+    except Exception as e:
+        raise click.ClickException(e) from e
 
 @deployments.command()
 @click.argument('name', required=True)
@@ -87,5 +90,5 @@ def trigger(ctx: CliContext, name: str, payload: str | None):
         click.echo(f"Deployment '{name}' triggered successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
-        raise click.ClickException("Failed") from e
+        raise click.ClickException(e) from e
 
