@@ -37,8 +37,8 @@ def create(
     function_name: str | None,
     language: str | None,
     requirements_path: str | None,
-    included_folders: list[str] | None,
-    system_dependencies: list[str] | None,
+    included_folders: List[str] | None,
+    system_dependencies: List[str] | None,
     dockerfile_path: str | None,
     repository_url: str | None,
     repository_branch: str | None,
@@ -127,6 +127,18 @@ def get(name: str):
     try:
         result = ctx.obj.sdk_instance.get_pipeline(name)
         click.echo(f"Pipeline '{name}' retrieved successfully")
+        click.echo(json.dumps(result, indent=2))
+    except Exception as e:
+        raise click.ClickException(e) from e
+
+@pipelines.command()
+def list():
+    """Get pipelines list"""
+    ctx = get_cli_context()
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.list_pipelines()
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
         raise click.ClickException(e) from e
