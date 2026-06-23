@@ -4,7 +4,29 @@ import click
 import json
 
 from utils import tabulize
-from utils.context import PROFILE_DIR, resolve_profile_path
+from utils.context import PROFILE_DIR, get_cli_context, resolve_profile_path
+
+def get_default_profile():
+    if not DEFAULT_PROFILE_PATH.exists():
+        return None
+
+    with open(DEFAULT_PROFILE_PATH, "r") as f:
+        default_profile = f.read().strip()
+        resolve_profile_path(default_profile)
+        return default_profile
+
+def set_default_profile(name: str | None):
+    if name is None:
+        DEFAULT_PROFILE_PATH.unlink(True)
+        return False
+
+    resolve_profile_path(name)
+
+    # Write default profile name
+    with open(DEFAULT_PROFILE_PATH, "w") as f:
+        f.write(name)
+    return True
+
 
 def ensure_profile_dir_exists():
     PROFILE_DIR.mkdir(exist_ok=True)
@@ -158,23 +180,24 @@ def default():
 
     click.echo(f"Current default profile: {default_profile}")
 
-def get_default_profile():
-    if not DEFAULT_PROFILE_PATH.exists():
-        return None
 
-    with open(DEFAULT_PROFILE_PATH, "r") as f:
-        default_profile = f.read().strip()
-        resolve_profile_path(default_profile)
-        return default_profile
 
-def set_default_profile(name: str | None):
-    if name is None:
-        DEFAULT_PROFILE_PATH.unlink(True)
-        return False
+@profiles.command()
+@click.argument('name', required=get_default_profile() is None)
+def export(name: str | None):
+    """Show the command to export the given profile to the bash session.
+    
+    Example use: `source <(craft-ai-cli profiles export)`"""
+    name_defaulted = name or get_default_profile()
+    assert(name_defaulted)
+    profile_path = resolve_profile_path(name_defaulted)
 
-    resolve_profile_path(name)
+    with open(profile_path, "r") as f:
+        profile_data = json.load(f)
 
-    # Write default profile name
-    with open(DEFAULT_PROFILE_PATH, "w") as f:
-        f.write(name)
-    return True
+    fields = {
+        "CRAFT_AI_SDK_TOKEN": profile_data['token'],
+        "CRAFT_AI_ENVIRONMENT_URL": profile_data['orchestrator_url'],
+        "CRAFT_AI_CONTROL_URL": profile_data.get('control_url', None)
+    }
+    click.echo('\n'.join([f"export {key}='{value}'" for (key, value) in fields.items() if value is not None]))

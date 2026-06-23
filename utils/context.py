@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import cast
 
 import click
 from craft_ai_sdk import CraftAiSdk
 
 PROFILE_DIR = Path.home() / ".config" / "craft-ai-cli"
-def resolve_profile_path(profile_name: str, assert_exists = True):
+def resolve_profile_path(profile_name: str, assert_exists: bool = True):
     path = PROFILE_DIR / f"{profile_name}.json"
     if assert_exists and not path.exists():
         raise click.ClickException(f"Profile '{profile_name}' does not exist.")
