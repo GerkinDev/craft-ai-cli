@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
 import click
 from craft_ai_sdk import CraftAiSdk
@@ -49,3 +49,9 @@ class CliContextObj():
 
 class CliContext(click.Context):
     obj: CliContextObj
+
+def get_cli_context(requires_obj: bool = True):
+    context = click.get_current_context()
+    if requires_obj:
+        assert isinstance(context.obj, CliContextObj)
+    return cast(CliContext, context)

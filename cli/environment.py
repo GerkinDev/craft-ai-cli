@@ -1,8 +1,9 @@
 import json
+from typing import Any, cast
 
 import click
 
-from utils import CliContext, tabulize, ellipsize
+from utils import get_cli_context, tabulize, ellipsize
 
 
 @click.group()
@@ -11,13 +12,14 @@ def environment():
     pass
 
 @environment.command()
-@click.pass_context
-def health(ctx: CliContext):
-    health: dict[str, dict] = ctx.obj.sdk_instance._session.get(f'{ctx.obj.sdk_instance.base_environment_api_url}/health', verify=False).json()
+def health():
+    """Get health of the environment"""
+    ctx = get_cli_context()
+    health: dict[str, dict[str, Any]] = ctx.obj.sdk_instance._session.get(f'{ctx.obj.sdk_instance.base_environment_api_url}/health', verify=False).json() # type: ignore
     tab_items = [
         {
             'Name': key,
-            'Status': entry['status'],
+            'Status': cast(str, entry['status']),
             'Details': ellipsize(json.dumps(entry.get('info', entry.get('error', None))), 50)
         } for (key, entry) in health.items()
     ]

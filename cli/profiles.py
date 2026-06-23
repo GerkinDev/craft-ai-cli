@@ -1,8 +1,10 @@
+from typing import List
+
 import click
 import json
 
 from utils import tabulize
-from utils.context import PROFILE_DIR, CliContext, resolve_profile_path
+from utils.context import PROFILE_DIR, resolve_profile_path
 
 def ensure_profile_dir_exists():
     PROFILE_DIR.mkdir(exist_ok=True)
@@ -22,7 +24,7 @@ def profiles():
 @click.option("--orchestrator-url", required=True, help="Orchestrator service URL.")
 @click.option("--token", help="User token.", required=True, prompt="Enter your SDK token", prompt_required=False, hide_input=True)
 @click.pass_context
-def create(ctx: CliContext, name: str, control_url: str, orchestrator_url: str, token: str):
+def create(ctx: click.Context, name: str, control_url: str, orchestrator_url: str, token: str):
     """Create a new profile with the specified settings."""
 
     if ctx.get_parameter_source('token') == click.ParameterSource.COMMANDLINE:
@@ -53,10 +55,10 @@ def list():
         return
 
     # Get default profile
-    default_profile = _get_default_profile()
+    default_profile = get_default_profile()
 
     # Collect all profile data
-    profile_data_list = []
+    profile_data_list: List[dict[str,str]] = []
 
     for profile in profiles:
         name = profile[:-5]  # Remove .json
@@ -71,7 +73,7 @@ def list():
         is_default = name == default_profile
 
         # build profile dict
-        profile_dict = {
+        profile_dict: dict[str,str] = {
             "Name": name,
             "Control URL": control_url,
             "Orchestrator URL": orchestrator_url,
@@ -96,7 +98,7 @@ def list():
 @click.option("--orchestrator-url", help="New orchestrator service URL.")
 @click.option("--token", help="New user token.", prompt="Enter your SDK token", prompt_required=False, hide_input=True)
 @click.pass_context
-def update(ctx: CliContext, name: str, control_url: str | None, orchestrator_url: str | None, token: str | None):
+def update(ctx: click.Context, name: str, control_url: str | None, orchestrator_url: str | None, token: str | None):
     """Update an existing profile with new settings."""
     profile_path = resolve_profile_path(name)
 
@@ -124,11 +126,11 @@ def delete(name: str):
     """Delete an existing profile."""
     profile_path = resolve_profile_path(name)
 
-    is_default = _get_default_profile() == name
+    is_default = get_default_profile() == name
     profile_path.unlink()
     click.echo(f"Profile '{name}' deleted successfully.")
     if is_default:
-        _set_default_profile(None)
+        set_default_profile(None)
         click.echo("Default profile unset.")
 
 
@@ -138,7 +140,7 @@ def delete(name: str):
 def set_default(name: str | None):
     """Set the default profile to use for commands."""
 
-    if _set_default_profile(name):
+    if set_default_profile(name):
         click.echo(f"Default profile set to '{name}'.")
     else:
         click.echo("Default profile unset.")
@@ -148,7 +150,7 @@ def set_default(name: str | None):
 def default():
     """Show the currently set default profile."""
 
-    default_profile = _get_default_profile()
+    default_profile = get_default_profile()
 
     if default_profile is None:
         click.echo("No default profile set.")
@@ -156,7 +158,7 @@ def default():
 
     click.echo(f"Current default profile: {default_profile}")
 
-def _get_default_profile():
+def get_default_profile():
     if not DEFAULT_PROFILE_PATH.exists():
         return None
 
@@ -165,7 +167,7 @@ def _get_default_profile():
         resolve_profile_path(default_profile)
         return default_profile
 
-def _set_default_profile(name: str | None):
+def set_default_profile(name: str | None):
     if name is None:
         DEFAULT_PROFILE_PATH.unlink(True)
         return False

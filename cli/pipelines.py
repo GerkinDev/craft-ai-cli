@@ -3,7 +3,7 @@ import json
 
 import click
 
-from utils import CliContext, parse_payload
+from utils import get_cli_context, parse_payload
 
 @click.group()
 def pipelines():
@@ -26,9 +26,7 @@ def pipelines():
 @click.option('--local-folder', type=click.Path(), help="Path to local folder containing the pipeline")
 @click.option('--inputs', type=click.File('r'), help="Path to JSON file containing input definitions")
 @click.option('--outputs', type=click.File('r'), help="Path to JSON file containing output definitions")
-@click.pass_context
 def create(
-    ctx: CliContext,
     name: str,
     description: str | None,
     function_path: str,
@@ -46,6 +44,7 @@ def create(
     outputs: click.File | None,
 ):
     """Create a pipeline with full configuration"""
+    ctx = get_cli_context()
 
     # Parse inputs and outputs from JSON files
     parsed_inputs = []
@@ -96,9 +95,9 @@ def create(
 @pipelines.command()
 @click.argument('name', required=True)
 @click.option('--force-deployments-deletion')
-@click.pass_context
-def delete(ctx: CliContext, name: str, force_deployments_deletion: bool):
+def delete(name: str, force_deployments_deletion: bool):
     """Delete a pipeline"""
+    ctx = get_cli_context()
 
     # Call SDK
     try:
@@ -110,9 +109,9 @@ def delete(ctx: CliContext, name: str, force_deployments_deletion: bool):
 
 @pipelines.command()
 @click.argument('name', required=True)
-@click.pass_context
-def get(ctx: CliContext, name: str):
+def get(name: str):
     """Get pipeline details"""
+    ctx = get_cli_context()
 
     # Call SDK
     try:
@@ -125,9 +124,9 @@ def get(ctx: CliContext, name: str):
 @pipelines.command()
 @click.argument('name', required=True)
 @click.option('--payload', type=str, help="Key-value dictionary with special syntax")
-@click.pass_context
-def trigger(ctx: CliContext, name: str, payload: str | None):
+def trigger(name: str, payload: str | None):
     """Trigger a pipeline"""
+    ctx = get_cli_context()
     
     if payload:
         parsed_payload = parse_payload(payload)

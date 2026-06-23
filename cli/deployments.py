@@ -3,7 +3,8 @@ import json
 
 import click
 
-from utils import CliContext, parse_payload
+from utils import parse_payload
+from utils.context import get_cli_context
 
 @click.group()
 def deployments():
@@ -17,9 +18,9 @@ def deployments():
 @click.option('--mode', type=click.Choice(['elastic', 'low-latency']), default='elastic')
 @click.option('--rule', type=click.Choice(['periodic', 'endpoint']), default='endpoint')
 @click.option('--schedule', type=str, help="Cron schedule for periodic type")
-@click.pass_context
-def create(ctx: CliContext, name: str, pipeline_name: str, description: str | None, mode: str, rule: str, schedule: str | None):
+def create(name: str, pipeline_name: str, description: str | None, mode: str, rule: str, schedule: str | None):
     """Create a deployment"""
+    ctx = get_cli_context()
     if rule == 'periodic' and not schedule:
         raise click.ClickException("Schedule is required for periodic rule")
     
@@ -33,9 +34,9 @@ def create(ctx: CliContext, name: str, pipeline_name: str, description: str | No
 
 @deployments.command()
 @click.argument('name', required=True)
-@click.pass_context
-def get(ctx: CliContext, name: str):
+def get(name: str):
     """Get deployment details"""
+    ctx = get_cli_context()
     
     # Call SDK
     try:
@@ -47,9 +48,9 @@ def get(ctx: CliContext, name: str):
 
 @deployments.command()
 @click.argument('name', required=True)
-@click.pass_context
-def delete(ctx: CliContext, name: str):
+def delete(name: str):
     """Delete a deployment"""
+    ctx = get_cli_context()
     
     # Call SDK
     try:
@@ -61,9 +62,9 @@ def delete(ctx: CliContext, name: str):
 
 @deployments.command()
 @click.argument('name', required=True)
-@click.pass_context
-def logs(ctx: CliContext, name: str):
+def logs(name: str):
     """Get the logs of a deployment"""
+    ctx = get_cli_context()
     
     # Call SDK
     try:
@@ -75,9 +76,9 @@ def logs(ctx: CliContext, name: str):
 @deployments.command()
 @click.argument('name', required=True)
 @click.option('--payload', type=str, help="Key-value dictionary with special syntax")
-@click.pass_context
-def trigger(ctx: CliContext, name: str, payload: str | None):
+def trigger(name: str, payload: str | None):
     """Trigger a deployment. Only valid for endpoint deployments"""
+    ctx = get_cli_context()
     if payload:
         parsed_payload = parse_payload(payload)
         click.echo(f"Triggering deployment '{name}' with payload: {parsed_payload!r}")

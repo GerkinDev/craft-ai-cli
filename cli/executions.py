@@ -3,7 +3,7 @@ import json
 
 import click
 
-from utils import CliContext
+from utils import get_cli_context
 
 @click.group()
 def executions():
@@ -12,9 +12,9 @@ def executions():
 
 @executions.command()
 @click.option('--deployment', type=str, help="Name of the deployment to get executions of")
-@click.pass_context
-def list(ctx: CliContext, deployment: str | None):
+def list(deployment: str | None):
     """List executions with a given filter"""
+    ctx = get_cli_context()
     
     if deployment:
         pipeline_name = ctx.obj.sdk_instance.get_deployment(deployment)['pipeline']['name']
