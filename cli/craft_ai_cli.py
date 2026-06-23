@@ -5,6 +5,7 @@ from cli.executions import executions
 from cli.deployments import deployments
 from cli.pipelines import pipelines
 from cli.profiles import _get_default_profile, profiles
+from cli.environment import environment
 from utils import CliContext
 from utils.context import CliContextObj
 
@@ -31,3 +32,4 @@ cli.add_command(pipelines)
 cli.add_command(deployments)
 cli.add_command(executions)
 cli.add_command(profiles)
+cli.add_command(environment)

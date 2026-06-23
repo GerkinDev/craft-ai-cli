@@ -1,6 +1,7 @@
 import click
 import json
 
+from utils import tabulize
 from utils.context import PROFILE_DIR, CliContext, resolve_profile_path
 
 def ensure_profile_dir_exists():
@@ -54,15 +55,6 @@ def list():
     # Get default profile
     default_profile = _get_default_profile()
 
-    # Define column headers and their minimum widths
-    columns = [
-        "Name",
-        "Default",
-        "Control URL",
-        "Orchestrator URL"
-    ]
-    min_widths = [len(header) for header in columns]  # Minimum widths for each header
-
     # Collect all profile data
     profile_data_list = []
 
@@ -86,28 +78,17 @@ def list():
             "Created At": created_at,
             "Default": "✓" if is_default else " "
         }
-
-        # update max lengths
-        for i in range(0, len(columns)):
-            column = columns[i]
-            column_value = profile_dict[column]
-            min_widths[i] = max(min_widths[i], len(column_value))
-
         profile_data_list.append(profile_dict)
-
-    # Format headers with dynamic widths
-    header_format = ' | '.join([f"{{{i}:<{min_widths[i]}}}" for i in range(0, len(columns))])
-    separator = "-" * (sum(min_widths) + (len(min_widths) - 1) * 3)
 
     # Print table
     click.echo("Profiles:")
-    click.echo(header_format.format(*columns))
-    click.echo(separator)
+    click.echo(tabulize([
+        "Name",
+        "Default",
+        "Control URL",
+        "Orchestrator URL"
+    ], profile_data_list))
 
-    for item in profile_data_list:
-        click.echo(
-            header_format.format(*[item[column] for column in columns])
-        )
 
 @profiles.command()
 @click.argument('name', required=True)
