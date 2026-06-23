@@ -15,8 +15,9 @@ def pipelines():
 @pipelines.command()
 @click.argument('name', required=True)
 @click.option('--description', type=str, help="Pipeline description")
-@click.option('--function-path', type=str, required=True, help="Path to the function file")
-@click.option('--function-name', type=str, required=True, help="Name of the function in the file")
+@click.option('--function', type=str, help="Shorthand function syntax, in the form of <function-path>:<function-name>")
+@click.option('--function-path', type=str, help="Path to the function file")
+@click.option('--function-name', type=str, help="Name of the function in the file")
 @click.option('--language', type=str, help="Language and version (e.g., 'python:3.8-slim')")
 @click.option('--requirements-path', type=click.Path(), help="Path to requirements.txt file")
 @click.option('--included-folders', multiple=True, help="List of folders/files to include (can be repeated)")
@@ -31,8 +32,9 @@ def pipelines():
 def create(
     name: str,
     description: str | None,
-    function_path: str,
-    function_name: str,
+    function: str | None,
+    function_path: str | None,
+    function_name: str | None,
     language: str | None,
     requirements_path: str | None,
     included_folders: list[str] | None,
@@ -47,6 +49,16 @@ def create(
 ):
     """Create a pipeline with full configuration"""
     ctx = get_cli_context()
+
+    if function:
+        if function_path or function_name:
+            raise click.ClickException('`--function` cannot be used with `--function-path` nor `--function-name`')
+        splitted = function.split(':', 2)
+        function_path = splitted[0]
+        function_name = splitted[1]
+    else:
+        if not function_path or not function_name:
+            raise click.ClickException('You must provide either `--function-path` and `--function-name`, or `--function`')
 
     # Parse inputs and outputs from JSON files
     parsed_inputs: List[Input] = []
