@@ -5,6 +5,7 @@ from cli.deployments import deployments
 from cli.pipelines import pipelines
 from cli.profiles import get_default_profile, profiles
 from cli.environment import environment
+from cli.misc import parse_payload
 from utils import CliContextObj, get_cli_context
 
 @click.group()
@@ -31,3 +32,4 @@ cli.add_command(deployments)
 cli.add_command(executions)
 cli.add_command(profiles)
 cli.add_command(environment)
+cli.add_command(parse_payload)

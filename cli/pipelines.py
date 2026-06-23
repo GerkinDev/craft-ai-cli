@@ -1,7 +1,9 @@
 
 import json
+from typing import List
 
 import click
+from craft_ai_sdk.io import Input, Output
 
 from utils import get_cli_context, parse_payload
 
@@ -24,8 +26,8 @@ def pipelines():
 @click.option('--repository-branch', type=str, help="Branch name")
 @click.option('--repository-deploy-key', type=str, help="SSH private key for the repository")
 @click.option('--local-folder', type=click.Path(), help="Path to local folder containing the pipeline")
-@click.option('--inputs', type=click.File('r'), help="Path to JSON file containing input definitions")
-@click.option('--outputs', type=click.File('r'), help="Path to JSON file containing output definitions")
+@click.option('--inputs', type=str, help="Inputs with payload syntax in the form of `<name>=<config>,<name>=<config>`. Run `<command> parse-payload` for help and testing")
+@click.option('--outputs', type=str, help="Outputs with payload syntax in the form of `<name>=<config>,<name>=<config>`. Run `<command> parse-payload` for help and testing")
 def create(
     name: str,
     description: str | None,
@@ -40,27 +42,23 @@ def create(
     repository_branch: str | None,
     repository_deploy_key: str | None,
     local_folder: str | None,
-    inputs: click.File | None,
-    outputs: click.File | None,
+    inputs: str | None,
+    outputs: str | None,
 ):
     """Create a pipeline with full configuration"""
     ctx = get_cli_context()
 
     # Parse inputs and outputs from JSON files
-    parsed_inputs = []
-    parsed_outputs = []
+    parsed_inputs: List[Input] = []
+    parsed_outputs: List[Output] = []
 
     if inputs:
-        try:
-            parsed_inputs = json.load(inputs)
-        except json.JSONDecodeError:
-            raise click.ClickException("Invalid JSON in inputs file")
+        for (input_name, input_config) in parse_payload(inputs).items():
+            parsed_inputs.append(Input(name=input_name, **input_config))
 
     if outputs:
-        try:
-            parsed_outputs = json.load(outputs)
-        except json.JSONDecodeError:
-            raise click.ClickException("Invalid JSON in outputs file")
+        for (output_name, output_config) in parse_payload(outputs).items():
+            parsed_outputs.append(Output(name=output_name, **output_config))
 
     # Build container config
     container_config = {
@@ -123,14 +121,22 @@ def get(name: str):
 
 @pipelines.command()
 @click.argument('name', required=True)
-@click.option('--payload', type=str, help="Key-value dictionary with special syntax")
+@click.option('--payload', type=str, help="Key-value dictionary with payload syntax. Run `<command> parse-payload` for help and testing")
 def trigger(name: str, payload: str | None):
     """Trigger a pipeline"""
     ctx = get_cli_context()
     
+    parsed_payload = None
     if payload:
         parsed_payload = parse_payload(payload)
         click.echo(f"Triggering pipeline '{name}' with payload: {parsed_payload!r}")
     else:
         click.echo(f"Triggering pipeline '{name}' with no payload")
-    raise click.Abort('Not implemented')
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.run_pipeline(name, parsed_payload)
+        click.echo(f"Pipeline '{name}' retrieved successfully")
+        click.echo(json.dumps(result, indent=2))
+    except Exception as e:
+        raise click.ClickException(e) from e

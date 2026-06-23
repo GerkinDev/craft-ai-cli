@@ -75,7 +75,7 @@ def logs(name: str):
 
 @deployments.command()
 @click.argument('name', required=True)
-@click.option('--payload', type=str, help="Key-value dictionary with special syntax")
+@click.option('--payload', type=str, help="Key-value dictionary with payload syntax. Run `<command> parse-payload` for help and testing")
 def trigger(name: str, payload: str | None):
     """Trigger a deployment. Only valid for endpoint deployments"""
     ctx = get_cli_context()
