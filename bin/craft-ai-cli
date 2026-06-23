@@ -21,4 +21,5 @@ get_script_dir()
     SCRIPT_DIR="$(cd -P "$( dirname "$SOURCE_PATH" )" >/dev/null 2>&1 && pwd)"
     echo "$SCRIPT_DIR"
 }
+source "$(get_script_dir)/../.venv/bin/activate"
 "$(get_script_dir)/../main.py" "$@"
