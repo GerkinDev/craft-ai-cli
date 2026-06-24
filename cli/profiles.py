@@ -200,4 +200,4 @@ def export(name: str | None):
         "CRAFT_AI_ENVIRONMENT_URL": profile_data['orchestrator_url'],
         "CRAFT_AI_CONTROL_URL": profile_data.get('control_url', None)
     }
-    click.echo('\n'.join([f"export {key}='{value}'" for (key, value) in fields.items() if value is not None]))
+    click.echo('\n'.join([f"export {key}='{value}'" if value else f"unset {key}" for (key, value) in fields.items()]))
