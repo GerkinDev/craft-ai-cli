@@ -1,8 +1,8 @@
 
 import json
-from typing import List
 
 import click
+from craft_ai_sdk.exceptions import SdkException
 from craft_ai_sdk.io import Input, Output
 
 from utils import get_cli_context, parse_payload
@@ -20,8 +20,8 @@ def pipelines():
 @click.option('--function-name', type=str, help="Name of the function in the file")
 @click.option('--language', type=str, help="Language and version (e.g., 'python:3.8-slim')")
 @click.option('--requirements-path', type=click.Path(), help="Path to requirements.txt file")
-@click.option('--included-folders', multiple=True, help="List of folders/files to include (can be repeated)")
-@click.option('--system-dependencies', multiple=True, help="List of system dependencies (can be repeated)")
+@click.option('--included-folder', type=click.Path(), multiple=True, help="Add a folder/file to include (can be repeated)")
+@click.option('--system-dependency', type=str, multiple=True, help="Add a system dependency (can be repeated)")
 @click.option('--dockerfile-path', type=click.Path(), help="Path to Dockerfile")
 @click.option('--repository-url', type=str, help="Remote repository URL")
 @click.option('--repository-branch', type=str, help="Branch name")
@@ -29,6 +29,7 @@ def pipelines():
 @click.option('--local-folder', type=click.Path(), help="Path to local folder containing the pipeline")
 @click.option('--inputs', type=str, help="Inputs with payload syntax in the form of `<name>=<config>,<name>=<config>`. Run `<command> parse-payload` for help and testing")
 @click.option('--outputs', type=str, help="Outputs with payload syntax in the form of `<name>=<config>,<name>=<config>`. Run `<command> parse-payload` for help and testing")
+@click.option('--recreate', is_flag=True, help="Recreate the pipeline if it already exists")
 def create(
     name: str,
     description: str | None,
@@ -37,8 +38,8 @@ def create(
     function_name: str | None,
     language: str | None,
     requirements_path: str | None,
-    included_folders: List[str] | None,
-    system_dependencies: List[str] | None,
+    included_folder: list[str] | None,
+    system_dependency: list[str] | None,
     dockerfile_path: str | None,
     repository_url: str | None,
     repository_branch: str | None,
@@ -46,10 +47,18 @@ def create(
     local_folder: str | None,
     inputs: str | None,
     outputs: str | None,
+    recreate: bool
 ):
-    """Create a pipeline with full configuration"""
+    """Create a pipeline with full configuration"""    
     ctx = get_cli_context()
 
+    if recreate:
+        try:
+            ctx.obj.sdk_instance.delete_pipeline(name, True)
+        except SdkException as e:
+            if e.status_code != 404:
+                raise
+            
     if function:
         if function_path or function_name:
             raise click.ClickException('`--function` cannot be used with `--function-path` nor `--function-name`')
@@ -61,8 +70,8 @@ def create(
             raise click.ClickException('You must provide either `--function-path` and `--function-name`, or `--function`')
 
     # Parse inputs and outputs from JSON files
-    parsed_inputs: List[Input] = []
-    parsed_outputs: List[Output] = []
+    parsed_inputs: list[Input] = []
+    parsed_outputs: list[Output] = []
 
     if inputs:
         for (input_name, input_config) in parse_payload(inputs).items():
@@ -79,8 +88,8 @@ def create(
         "repository_branch": repository_branch,
         "repository_deploy_key": repository_deploy_key,
         "requirements_path": requirements_path,
-        "included_folders": list(included_folders) if included_folders else None,
-        "system_dependencies": list(system_dependencies) if system_dependencies else None,
+        "included_folders": list(included_folder),
+        "system_dependencies": list(system_dependency),
         "dockerfile_path": dockerfile_path,
         "language": language
     }
@@ -131,8 +140,8 @@ def get(name: str):
     except Exception as e:
         raise click.ClickException(e) from e
 
-@pipelines.command()
-def list():
+@pipelines.command('list')
+def list_pipelines():
     """Get pipelines list"""
     ctx = get_cli_context()
 
@@ -161,6 +170,6 @@ def trigger(name: str, payload: str | None):
     try:
         result = ctx.obj.sdk_instance.run_pipeline(name, parsed_payload)
         click.echo(f"Pipeline '{name}' retrieved successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(f'{result!r}')
     except Exception as e:
         raise click.ClickException(e) from e
