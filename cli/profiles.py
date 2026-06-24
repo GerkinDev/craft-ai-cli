@@ -4,7 +4,7 @@ import click
 import json
 
 from utils import tabulize
-from utils.context import PROFILE_DIR, get_cli_context, resolve_profile_path
+from utils.context import PROFILE_DIR, PROFILE_ENV_VAR, get_cli_context, resolve_profile_path
 
 def get_default_profile():
     if not DEFAULT_PROFILE_PATH.exists():
@@ -97,7 +97,7 @@ def list():
         # build profile dict
         profile_dict: dict[str,str] = {
             "Name": name,
-            "Control URL": control_url,
+            "Control URL": control_url or "",
             "Orchestrator URL": orchestrator_url,
             "Created At": created_at,
             "Default": "✓" if is_default else " "
@@ -181,13 +181,31 @@ def default():
     click.echo(f"Current default profile: {default_profile}")
 
 
+def _print_sourceable(values: dict[str, str | None]):
+    click.echo('\n'.join([f"export {key}='{value}'" if value else f"unset {key}" for (key, value) in values.items()]))
+
+@profiles.command()
+@click.argument('name', required=False)
+@click.option('--clear', is_flag=True, help="Unset the profile for the current session.")
+def use(name: str | None, clear: bool):
+    """Show the command to export the given profile to the bash session.
+    
+    Example usage: `source <(craft-ai-cli profiles use <name>)`"""
+    if clear:
+        _print_sourceable({PROFILE_ENV_VAR: None})
+        return
+    if name is None:
+        raise click.BadArgumentUsage('`<name> is required when `--clear` is not passed')
+
+    _print_sourceable({PROFILE_ENV_VAR: name})
+
 
 @profiles.command()
 @click.argument('name', required=get_default_profile() is None)
 def export(name: str | None):
     """Show the command to export the given profile to the bash session.
     
-    Example use: `source <(craft-ai-cli profiles export)`"""
+    Example usage: `source <(craft-ai-cli profiles export)`"""
     name_defaulted = name or get_default_profile()
     assert(name_defaulted)
     profile_path = resolve_profile_path(name_defaulted)
@@ -200,4 +218,4 @@ def export(name: str | None):
         "CRAFT_AI_ENVIRONMENT_URL": profile_data['orchestrator_url'],
         "CRAFT_AI_CONTROL_URL": profile_data.get('control_url', None)
     }
-    click.echo('\n'.join([f"export {key}='{value}'" if value else f"unset {key}" for (key, value) in fields.items()]))
+    _print_sourceable(fields)
