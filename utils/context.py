@@ -47,22 +47,33 @@ class HttpWrapper:
         self, 
         url: requests_types.UriType, 
         params: requests_types.ParamsType=None,
+        *,
+        raise_for_status: bool = True,
         **kwargs: Unpack[requests_types.GetKwargs]
     ) -> requests.Response:
-        return self._cli_context.sdk_instance._session.get(
+        response = self._cli_context.sdk_instance._session.get(
             f'{self._base_url}{url}',
             params=params,
-            **{'verify': True, **(self._extra_kwargs or {}), **kwargs})
+            **{**(self._extra_kwargs or {}), **kwargs})
+        if raise_for_status:
+            response.raise_for_status()
+        return response
+    
     def patch(
         self, 
         url: requests_types.UriType, 
         data: requests_types.DataType=None,
+        *,
+        raise_for_status: bool = True,
         **kwargs: Unpack[requests_types.DataKwargs]
     ) -> requests.Response:
-        return self._cli_context.sdk_instance._session.patch(
+        response = self._cli_context.sdk_instance._session.patch(
             f'{self._base_url}{url}',
             data=data,
-            **{'verify': True, **(self._extra_kwargs or {}), **kwargs})
+            **{**(self._extra_kwargs or {}), **kwargs})
+        if raise_for_status:
+            response.raise_for_status()
+        return response
     
 class ServiceClient(HttpWrapper):
     def __init__(self, cli_context: 'CliContextObj', base_url: str):
