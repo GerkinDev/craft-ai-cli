@@ -20,6 +20,7 @@ def get_environment_summary():
     env_status = summary['environment_status']
     env_update = datetime.fromisoformat(summary['environment_status_updated_at'])
     return EnvironmentSummary(status=env_status, updated_at=env_update)
+
 class EnvironmentSummary(TypedDict):
     status: (
         Literal['creating-step-1'] |
@@ -57,7 +58,7 @@ def health():
     ))
 
 @environment.command()
-@click.argument('target')
+@click.argument('target', type=click.Choice(['ready', 'standby']))
 @click.option('--no-wait', is_flag=True)
 def put_on(target: str, no_wait: bool):
     """Update the state of an environment
@@ -80,7 +81,7 @@ def put_on(target: str, no_wait: bool):
             click.echo(f'Environment is in state {environment_status}, which is expected to transition to "ready"')
         elif environment_status == 'standby':
             click.echo('Sending request to environment')
-            print(f'{ctx.obj.control.patch(f'/api/v1/environments/{environment_id}', {'status': 'resuming-step-1'}).json()!r}')
+            ctx.obj.control.patch(f'/api/v1/environments/{environment_id}', {'status': 'resuming-step-1'}).json()
         else:
             raise click.Abort(f'Environment is in unexpected state {environment_status}')
     else:
@@ -88,7 +89,7 @@ def put_on(target: str, no_wait: bool):
             click.echo(f'Environment is in state {environment_status}, which is expected to transition to "standby"')
         elif environment_status == 'ready':
             click.echo('Sending request to environment')
-            print(f'{ctx.obj.control.patch(f'/api/v1/environments/{environment_id}', {'status': 'pausing-step-1'}).json()!r}')
+            ctx.obj.control.patch(f'/api/v1/environments/{environment_id}', {'status': 'pausing-step-1'}).json()
         else:
             raise click.Abort(f'Environment is in unexpected state {environment_status}')
     

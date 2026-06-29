@@ -5,6 +5,7 @@ import click
 
 from utils import parse_payload
 from utils.context import get_cli_context
+from craft_ai_sdk.constants import DEPLOYMENT_MODES
 
 @click.group()
 def deployments():
@@ -26,7 +27,14 @@ def create(name: str, pipeline_name: str, description: str | None, mode: str, ru
     
     # Call SDK
     try:
-        result = ctx.obj.sdk_instance.create_deployment(deployment_name=name, pipeline_name=pipeline_name, description=description, mode=mode,execution_rule=rule, schedule=schedule)
+        result = ctx.obj.sdk_instance.create_deployment(
+            deployment_name=name,
+            pipeline_name=pipeline_name,
+            description=description,
+            mode={'elastic': DEPLOYMENT_MODES.ELASTIC, 'low-latency': DEPLOYMENT_MODES.LOW_LATENCY, None: None}[mode],
+            execution_rule=rule,
+            schedule=schedule
+        )
         click.echo(f"Deployment '{name}' created successfully")
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
@@ -79,6 +87,7 @@ def logs(name: str):
 def trigger(name: str, payload: str | None):
     """Trigger a deployment. Only valid for endpoint deployments"""
     ctx = get_cli_context()
+    parsed_payload = None
     if payload:
         parsed_payload = parse_payload(payload)
         click.echo(f"Triggering deployment '{name}' with payload: {parsed_payload!r}")
@@ -87,9 +96,9 @@ def trigger(name: str, payload: str | None):
     
     # Call SDK
     try:
-        result = ctx.obj.sdk_instance.trigger_endpoint(name)
+        result = ctx.obj.sdk_instance.trigger_endpoint(name, inputs=parsed_payload)
         click.echo(f"Deployment '{name}' triggered successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(f'{result!r}')
     except Exception as e:
         raise click.ClickException(e) from e
 
