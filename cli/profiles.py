@@ -71,6 +71,7 @@ def create(ctx: click.Context, name: str, control_url: str, orchestrator_url: st
 @profiles.command()
 def list():
     """List all saved profiles in a table format with detailed information."""
+    ctx = get_cli_context()
     profiles = [f.name for f in PROFILE_DIR.glob("*.json")]
     if not profiles:
         click.echo("No profiles found.")
@@ -93,6 +94,7 @@ def list():
         orchestrator_url = profile_raw_data.get("orchestrator_url", "N/A")
         created_at = profile_raw_data.get("created_at", "N/A")
         is_default = name == default_profile
+        is_active = name == ctx.obj.profile
 
         # build profile dict
         profile_dict: dict[str,str] = {
@@ -100,7 +102,7 @@ def list():
             "Control URL": control_url or "",
             "Orchestrator URL": orchestrator_url,
             "Created At": created_at,
-            "Default": "✓" if is_default else " "
+            "Usage": ("⭐" if is_default else "  ") + ("✅" if is_active else "   ")
         }
         profile_data_list.append(profile_dict)
 
@@ -108,7 +110,7 @@ def list():
     click.echo("Profiles:")
     click.echo(tabulize([
         "Name",
-        "Default",
+        "Usage",
         "Control URL",
         "Orchestrator URL"
     ], profile_data_list))
@@ -162,6 +164,9 @@ def delete(name: str):
 def set_default(name: str | None):
     """Set the default profile to use for commands."""
 
+    if name:
+        resolve_profile_path(name)
+
     if set_default_profile(name):
         click.echo(f"Default profile set to '{name}'.")
     else:
@@ -192,20 +197,35 @@ def use(name: str | None, clear: bool):
     
     Example usage: `source <(craft-ai-cli profiles use <name>)`"""
     if clear:
-        _print_sourceable({PROFILE_ENV_VAR: None})
+        _print_sourceable({PROFILE_ENV_VAR: '_'})
         return
     if name is None:
         raise click.BadArgumentUsage('`<name> is required when `--clear` is not passed')
+    
+    resolve_profile_path(name)
 
     _print_sourceable({PROFILE_ENV_VAR: name})
 
 
 @profiles.command()
-@click.argument('name', required=get_default_profile() is None)
-def export(name: str | None):
+@click.argument('name', required=False)
+@click.option('--clear', is_flag=True, help="Unset the profile for the current session.")
+@click.pass_context
+def export(ctx: click.Context, name: str | None, clear: bool):
     """Show the command to export the given profile to the bash session.
     
     Example usage: `source <(craft-ai-cli profiles export)`"""
+    if clear and name:
+        raise click.exceptions.UsageError("Cannot use both `<name>` and `--clear`", ctx)
+    if clear:
+        fields: dict[str, str | None] = {
+            "CRAFT_AI_SDK_TOKEN": None,
+            "CRAFT_AI_ENVIRONMENT_URL": None,
+            "CRAFT_AI_CONTROL_URL": None,
+        }
+        _print_sourceable(fields)
+        return
+
     name_defaulted = name or get_default_profile()
     assert(name_defaulted)
     profile_path = resolve_profile_path(name_defaulted)

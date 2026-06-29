@@ -21,12 +21,12 @@ def cli(control_url: str | None, orchestrator_url: str | None, token: str | None
     """Craft CLI - Pipeline and Deployment Management Tool"""
     ctx = get_cli_context(False)
     if ctx.get_parameter_source('profile') == click.ParameterSource.COMMANDLINE and no_profile:
-        raise click.exceptions.UsageError("Cannot use both `--profile` and --no-profile", ctx)
+        raise click.exceptions.UsageError("Cannot use both `--profile` and `--no-profile`", ctx)
     ctx.obj = CliContextObj(
         sdk_token=token, 
         orchestrator_url=orchestrator_url, 
         control_url=control_url,
-        profile=None if no_profile else profile
+        profile=None if no_profile else (profile if profile != '_' else None)
     )
     pass
 
