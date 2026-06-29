@@ -14,6 +14,8 @@
    export PATH="$PATH:<path to clone dir>/bin"
    ```
 
+> You can work on your custom SDK by replacing `craft_ai_sdk>=...` with `file://</path/to/your/sdk>` in <./requirements.txt>, and reinstalling
+
 ## Useful commands
 
 ### Manage profiles
