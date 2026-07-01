@@ -1,4 +1,3 @@
-
 from contextlib import contextmanager
 import sys
 from typing import Any
@@ -17,17 +16,21 @@ def measure_table(rows: cabc.Iterable[tuple[str, str]]) -> tuple[int, ...]:
 
     return tuple(y for x, y in sorted(widths.items()))
 
+
 def iter_rows(
     rows: cabc.Iterable[tuple[str, str]], col_count: int
 ) -> cabc.Iterator[tuple[str, ...]]:
     for row in rows:
         yield row + ("",) * (col_count - len(row))
 
-def term_len(str:str):
+
+def term_len(str: str):
     return len(str)
 
+
 def wrap_text(text: str, *args: Any, initial_indent: str | None = None, **kwargs: Any):
-    return (initial_indent or '') + text
+    return (initial_indent or "") + text
+
 
 class CustomHelpFormatter(click.HelpFormatter):
     """This class helps with formatting text-based help pages.  It's
@@ -52,8 +55,8 @@ class CustomHelpFormatter(click.HelpFormatter):
 
     @property
     def base_heading(self):
-        return '#'*self.heading_level
-    
+        return "#" * self.heading_level
+
     def write(self, string: str) -> None:
         """Writes a unicode string into the internal buffer."""
         self.buffer.append(string)
@@ -74,9 +77,9 @@ class CustomHelpFormatter(click.HelpFormatter):
         :param prefix: The prefix for the first line. Defaults to
             ``"Usage: "``.
         """
-        
+
         if prefix is None:
-            prefix = self.base_heading+" "
+            prefix = self.base_heading + " "
 
         usage_prefix = f"{prefix:>{self.current_indent}}{prog} "
         text_width = self.width - self.current_indent
@@ -152,23 +155,27 @@ class CustomHelpFormatter(click.HelpFormatter):
         :param col_spacing: the number of spaces between the first and
                             second column.
         """
+
         def sanitize_col(col: str):
-            return col.replace('|', '&#124;').replace('\n', '<br/>')
+            return col.replace("|", "&#124;").replace("\n", "<br/>")
+
         rows = [(sanitize_col(first), sanitize_col(second)) for first, second in rows]
         widths = measure_table(rows)
         if len(widths) != 2:
             raise TypeError("Expected two columns for definition list")
 
-        first_col_header = 'Name'
-        second_col_header = 'Description'
+        first_col_header = "Name"
+        second_col_header = "Description"
         first_col_width = max(widths[0], len(first_col_header))
         second_col_width = max(widths[1], len(second_col_header))
-        line_format = f'|{{0}}{{1:<{first_col_width}}}{{0}}|{{0}}{{2:<{second_col_width}}}{{0}}|\n'
+        line_format = f"|{{0}}{{1:<{first_col_width}}}{{0}}|{{0}}{{2:<{second_col_width}}}{{0}}|\n"
 
-        self.write(line_format.format(' ', first_col_header, second_col_header))
-        self.write(line_format.format('-', '-'*first_col_width, '-'*second_col_width))
+        self.write(line_format.format(" ", first_col_header, second_col_header))
+        self.write(
+            line_format.format("-", "-" * first_col_width, "-" * second_col_width)
+        )
         for first, second in iter_rows(rows, len(widths)):
-            self.write(line_format.format(' ', first, second))
+            self.write(line_format.format(" ", first, second))
 
     @contextmanager
     def section(self, name: str) -> cabc.Iterator[None]:

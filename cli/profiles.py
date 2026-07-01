@@ -4,7 +4,13 @@ import click
 import json
 
 from utils import tabulize
-from utils.context import PROFILE_DIR, PROFILE_ENV_VAR, get_cli_context, resolve_profile_path
+from utils.context import (
+    PROFILE_DIR,
+    PROFILE_ENV_VAR,
+    get_cli_context,
+    resolve_profile_path,
+)
+
 
 def get_default_profile():
     if not DEFAULT_PROFILE_PATH.exists():
@@ -14,6 +20,7 @@ def get_default_profile():
         default_profile = f.read().strip()
         resolve_profile_path(default_profile)
         return default_profile
+
 
 def set_default_profile(name: str | None):
     if name is None:
@@ -31,6 +38,7 @@ def set_default_profile(name: str | None):
 def ensure_profile_dir_exists():
     PROFILE_DIR.mkdir(exist_ok=True)
 
+
 # Add this to the top of your module
 DEFAULT_PROFILE_PATH = PROFILE_DIR / ".default_profile"
 
@@ -40,17 +48,30 @@ def profiles():
     """Manage profiles containing control/orchestrator/token configurations."""
     ensure_profile_dir_exists()
 
+
 @profiles.command()
-@click.argument('name', required=True)
+@click.argument("name", required=True)
 @click.option("--control-url", required=False, help="Control service URL.")
 @click.option("--orchestrator-url", required=True, help="Orchestrator service URL.")
-@click.option("--token", help="User token.", required=True, prompt="Enter your SDK token", prompt_required=False, hide_input=True)
+@click.option(
+    "--token",
+    help="User token.",
+    required=True,
+    prompt="Enter your SDK token",
+    prompt_required=False,
+    hide_input=True,
+)
 @click.pass_context
-def create(ctx: click.Context, name: str, control_url: str, orchestrator_url: str, token: str):
+def create(
+    ctx: click.Context, name: str, control_url: str, orchestrator_url: str, token: str
+):
     """Create a new profile with the specified settings."""
 
-    if ctx.get_parameter_source('token') == click.ParameterSource.COMMANDLINE:
-        click.echo("Passing the token through commandline is insecure. Prefer using the `--token` flag without argument", err=True)
+    if ctx.get_parameter_source("token") == click.ParameterSource.COMMANDLINE:
+        click.echo(
+            "Passing the token through commandline is insecure. Prefer using the `--token` flag without argument",
+            err=True,
+        )
 
     profile_path = resolve_profile_path(name, False)
 
@@ -68,6 +89,7 @@ def create(ctx: click.Context, name: str, control_url: str, orchestrator_url: st
 
     click.echo(f"Profile '{name}' created successfully.")
 
+
 @profiles.command()
 def list():
     """List all saved profiles in a table format with detailed information."""
@@ -81,7 +103,7 @@ def list():
     default_profile = get_default_profile()
 
     # Collect all profile data
-    profile_data_list: List[dict[str,str]] = []
+    profile_data_list: List[dict[str, str]] = []
 
     for profile in profiles:
         name = profile[:-5]  # Remove .json
@@ -97,37 +119,51 @@ def list():
         is_active = name == ctx.obj.profile
 
         # build profile dict
-        profile_dict: dict[str,str] = {
+        profile_dict: dict[str, str] = {
             "Name": name,
             "Control URL": control_url or "",
             "Orchestrator URL": orchestrator_url,
             "Created At": created_at,
-            "Usage": ("⭐" if is_default else "  ") + ("✅" if is_active else "   ")
+            "Usage": ("⭐" if is_default else "  ") + ("✅" if is_active else "   "),
         }
         profile_data_list.append(profile_dict)
 
     # Print table
     click.echo("Profiles:")
-    click.echo(tabulize([
-        "Name",
-        "Usage",
-        "Control URL",
-        "Orchestrator URL"
-    ], profile_data_list))
+    click.echo(
+        tabulize(
+            ["Name", "Usage", "Control URL", "Orchestrator URL"], profile_data_list
+        )
+    )
 
 
 @profiles.command()
-@click.argument('name', required=True)
+@click.argument("name", required=True)
 @click.option("--control-url", help="New control service URL.")
 @click.option("--orchestrator-url", help="New orchestrator service URL.")
-@click.option("--token", help="New user token.", prompt="Enter your SDK token", prompt_required=False, hide_input=True)
+@click.option(
+    "--token",
+    help="New user token.",
+    prompt="Enter your SDK token",
+    prompt_required=False,
+    hide_input=True,
+)
 @click.pass_context
-def update(ctx: click.Context, name: str, control_url: str | None, orchestrator_url: str | None, token: str | None):
+def update(
+    ctx: click.Context,
+    name: str,
+    control_url: str | None,
+    orchestrator_url: str | None,
+    token: str | None,
+):
     """Update an existing profile with new settings."""
     profile_path = resolve_profile_path(name)
 
-    if ctx.get_parameter_source('token') == click.ParameterSource.COMMANDLINE:
-        click.echo("Passing the token through commandline is insecure. Prefer using the `--token` flag without argument", err=True)
+    if ctx.get_parameter_source("token") == click.ParameterSource.COMMANDLINE:
+        click.echo(
+            "Passing the token through commandline is insecure. Prefer using the `--token` flag without argument",
+            err=True,
+        )
 
     with open(profile_path, "r") as f:
         profile_data = json.load(f)
@@ -144,8 +180,9 @@ def update(ctx: click.Context, name: str, control_url: str | None, orchestrator_
 
     click.echo(f"Profile '{name}' updated successfully.")
 
+
 @profiles.command()
-@click.argument('name', required=True)
+@click.argument("name", required=True)
 def delete(name: str):
     """Delete an existing profile."""
     profile_path = resolve_profile_path(name)
@@ -158,9 +195,8 @@ def delete(name: str):
         click.echo("Default profile unset.")
 
 
-
 @profiles.command()
-@click.argument('name', required=False)
+@click.argument("name", required=False)
 def set_default(name: str | None):
     """Set the default profile to use for commands."""
 
@@ -187,33 +223,45 @@ def default():
 
 
 def _print_sourceable(values: dict[str, str | None]):
-    click.echo('\n'.join([f"export {key}='{value}'" if value else f"unset {key}" for (key, value) in values.items()]))
+    click.echo(
+        "\n".join(
+            [
+                f"export {key}='{value}'" if value else f"unset {key}"
+                for (key, value) in values.items()
+            ]
+        )
+    )
+
 
 @profiles.command()
-@click.argument('name', required=False)
-@click.option('--clear', is_flag=True, help="Unset the profile for the current session.")
+@click.argument("name", required=False)
+@click.option(
+    "--clear", is_flag=True, help="Unset the profile for the current session."
+)
 def use(name: str | None, clear: bool):
     """Show the command to export the given profile to the bash session.
-    
+
     Example usage: `source <(craft-ai-cli profiles use <name>)`"""
     if clear:
-        _print_sourceable({PROFILE_ENV_VAR: '_'})
+        _print_sourceable({PROFILE_ENV_VAR: "_"})
         return
     if name is None:
-        raise click.BadArgumentUsage('`<name> is required when `--clear` is not passed')
-    
+        raise click.BadArgumentUsage("`<name> is required when `--clear` is not passed")
+
     resolve_profile_path(name)
 
     _print_sourceable({PROFILE_ENV_VAR: name})
 
 
 @profiles.command()
-@click.argument('name', required=False)
-@click.option('--clear', is_flag=True, help="Unset the profile for the current session.")
+@click.argument("name", required=False)
+@click.option(
+    "--clear", is_flag=True, help="Unset the profile for the current session."
+)
 @click.pass_context
 def export(ctx: click.Context, name: str | None, clear: bool):
     """Show the command to export the given profile to the bash session.
-    
+
     Example usage: `source <(craft-ai-cli profiles export)`"""
     if clear and name:
         raise click.exceptions.UsageError("Cannot use both `<name>` and `--clear`", ctx)
@@ -227,15 +275,15 @@ def export(ctx: click.Context, name: str | None, clear: bool):
         return
 
     name_defaulted = name or get_default_profile()
-    assert(name_defaulted)
+    assert name_defaulted
     profile_path = resolve_profile_path(name_defaulted)
 
     with open(profile_path, "r") as f:
         profile_data = json.load(f)
 
     fields = {
-        "CRAFT_AI_SDK_TOKEN": profile_data['token'],
-        "CRAFT_AI_ENVIRONMENT_URL": profile_data['orchestrator_url'],
-        "CRAFT_AI_CONTROL_URL": profile_data.get('control_url', None)
+        "CRAFT_AI_SDK_TOKEN": profile_data["token"],
+        "CRAFT_AI_ENVIRONMENT_URL": profile_data["orchestrator_url"],
+        "CRAFT_AI_CONTROL_URL": profile_data.get("control_url", None),
     }
     _print_sourceable(fields)
