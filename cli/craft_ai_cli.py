@@ -11,7 +11,7 @@ from cli.misc import parse_payload
 from utils import CliContextObj, get_cli_context
 from utils.context import PROFILE_ENV_VAR
 
-@click.group()
+@click.group(name="craft-ai-cli")
 @click.option('--control-url', help="Control URL")
 @click.option('--orchestrator-url', help="Orchestrator URL")
 @click.option('--token', help="SDK token")
