@@ -15,16 +15,15 @@ def tabulize(columns: list[str| tuple[str,str]], data: list[dict[str,str]]):
             min_widths[key] = max(min_widths[key], len(column_value))
 
     # Format headers with dynamic widths
-    header_format = ' | '.join([
-        f"{{{index}:<{min_widths[key]}}}"
+    line_format = '{0}|{0}'.join([
+        f"{{{index + 1}:<{min_widths[key]}}}"
         for (index, key) in enumerate(columns_normalized.keys())
     ])
-    separator = "-" * (sum(min_widths.values()) + (len(min_widths) - 1) * 3)
 
     return '\n'.join([
-        header_format.format(*[label for label in columns_normalized.values()]),
-        separator,
-        *[header_format.format(*[item[key] for key in columns_normalized.keys()]) for item in data]
+        line_format.format(' ', *[label for label in columns_normalized.values()]),
+        line_format.format('-', *['-'*min_widths[key] for key in columns_normalized.keys()]),
+        *[line_format.format(' ', *[item[key] for key in columns_normalized.keys()]) for item in data]
     ])
 
 def ellipsize(string: str, length: int):
