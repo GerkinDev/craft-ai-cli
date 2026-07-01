@@ -267,6 +267,7 @@ def export(ctx: click.Context, name: str | None, clear: bool):
         raise click.exceptions.UsageError("Cannot use both `<name>` and `--clear`", ctx)
     if clear:
         fields: dict[str, str | None] = {
+            PROFILE_ENV_VAR: None,
             "CRAFT_AI_SDK_TOKEN": None,
             "CRAFT_AI_ENVIRONMENT_URL": None,
             "CRAFT_AI_CONTROL_URL": None,
@@ -282,6 +283,7 @@ def export(ctx: click.Context, name: str | None, clear: bool):
         profile_data = json.load(f)
 
     fields = {
+        PROFILE_ENV_VAR: "_",
         "CRAFT_AI_SDK_TOKEN": profile_data["token"],
         "CRAFT_AI_ENVIRONMENT_URL": profile_data["orchestrator_url"],
         "CRAFT_AI_CONTROL_URL": profile_data.get("control_url", None),
