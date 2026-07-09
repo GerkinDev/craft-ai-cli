@@ -15,6 +15,27 @@ def environment():
     pass
 
 
+type EnvironmentStatus = (
+    Literal["creating-step-1"]
+    | Literal["creating-step-2"]
+    | Literal["creating-step-3"]
+    | Literal["ready"]
+    | Literal["pausing-step-1"]
+    | Literal["pausing-step-2"]
+    | Literal["standby"]
+    | Literal["resuming-step-1"]
+    | Literal["resuming-step-2"]
+    | Literal["deleting-step-1"]
+    | Literal["deleting-step-2"]
+    | Literal["deleted"]
+)
+
+
+class EnvironmentSummary(TypedDict):
+    status: EnvironmentStatus
+    updated_at: datetime
+
+
 def get_environment_summary():
     ctx = get_cli_context()
     summary: Any = ctx.obj.orchestrator.get("/api/v1/environment-summary").json()
@@ -23,22 +44,18 @@ def get_environment_summary():
     return EnvironmentSummary(status=env_status, updated_at=env_update)
 
 
-class EnvironmentSummary(TypedDict):
-    status: (
-        Literal["creating-step-1"]
-        | Literal["creating-step-2"]
-        | Literal["creating-step-3"]
-        | Literal["ready"]
-        | Literal["pausing-step-1"]
-        | Literal["pausing-step-2"]
-        | Literal["standby"]
-        | Literal["resuming-step-1"]
-        | Literal["resuming-step-2"]
-        | Literal["deleting-step-1"]
-        | Literal["deleting-step-2"]
-        | Literal["deleted"]
-    )
-    updated_at: datetime
+class EnvironmentInfo(TypedDict):
+    environment_id: str
+    environment_status: EnvironmentStatus
+    version: str
+    gpu_enabled: bool
+    supported_base_images: dict[str, list[str]]
+
+
+def get_environment_info():
+    ctx = get_cli_context()
+    info: Any = ctx.obj.orchestrator.get("/api/v1/environment-info").json()
+    return EnvironmentInfo(**info)
 
 
 @environment.command()

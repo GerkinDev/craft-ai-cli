@@ -124,7 +124,7 @@ def list():
             "Control URL": control_url or "",
             "Orchestrator URL": orchestrator_url,
             "Created At": created_at,
-            "Usage": ("⭐" if is_default else "  ") + ("✅" if is_active else "   "),
+            "Usage": ("★" if is_default else "  ") + ("🗹" if is_active else "   "),
         }
         profile_data_list.append(profile_dict)
 
