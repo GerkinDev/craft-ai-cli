@@ -6,7 +6,7 @@ from typing import Any, Literal, TypedDict, cast
 import click
 import requests
 
-from utils import get_cli_context, tabulize, ellipsize
+from utils import get_cli_context, tabulize_list, ellipsize
 
 
 @click.group()
@@ -83,7 +83,7 @@ def health():
             for (key, entry) in health.items()
         ],
     ]
-    click.echo(tabulize(["Name", "Status", "Details"], tab_items))
+    click.echo(tabulize_list(tab_items, ["Name", "Status", "Details"]))
 
 
 @environment.command()
@@ -91,8 +91,7 @@ def info():
     """Get info of the environment"""
     info = get_environment_info()
     click.echo(
-        tabulize(
-            ["Name", "Value"],
+        tabulize_list(
             [
                 {"Name": "ID", "Value": info["environment_id"]},
                 {"Name": "Status", "Value": info["environment_status"]},
@@ -103,6 +102,7 @@ def info():
                     for base, tags in info["supported_base_images"].items()
                 ],
             ],
+            ["Name", "Value"],
         )
     )
 

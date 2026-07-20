@@ -4,7 +4,7 @@ import click
 from craft_ai_sdk.exceptions import SdkException
 from craft_ai_sdk.io import Input, Output
 
-from utils import get_cli_context, parse_payload
+from utils import get_cli_context, parse_payload, tabulize_dict, tabulize_list
 
 
 @click.group()
@@ -146,7 +146,7 @@ def create(
             wait_for_completion=True,
         )
         click.echo(f"Pipeline '{name}' created successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -164,7 +164,7 @@ def delete(name: str, force_deployments_deletion: bool):
             name, force_deployments_deletion=force_deployments_deletion
         )
         click.echo(f"Pipeline '{name}' deleted successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -179,7 +179,7 @@ def get(name: str):
     try:
         result = ctx.obj.sdk_instance.get_pipeline(name)
         click.echo(f"Pipeline '{name}' retrieved successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -192,7 +192,7 @@ def list_pipelines():
     # Call SDK
     try:
         result = ctx.obj.sdk_instance.list_pipelines()
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_list(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -219,6 +219,6 @@ def trigger(name: str, payload: str | None):
     try:
         result = ctx.obj.sdk_instance.run_pipeline(name, parsed_payload)
         click.echo(f"Pipeline '{name}' retrieved successfully")
-        click.echo(f"{result!r}")
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e

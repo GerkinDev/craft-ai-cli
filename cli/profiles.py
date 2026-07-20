@@ -3,7 +3,7 @@ from typing import List
 import click
 import json
 
-from utils import tabulize
+from utils import tabulize, tabulize_list, tabulize_dict
 from utils.context import (
     PROFILE_DIR,
     PROFILE_ENV_VAR,
@@ -131,8 +131,8 @@ def list():
     # Print table
     click.echo("Profiles:")
     click.echo(
-        tabulize(
-            ["Name", "Usage", "Control URL", "Orchestrator URL"], profile_data_list
+        tabulize_list(
+            profile_data_list, ["Name", "Usage", "Control URL", "Orchestrator URL"]
         )
     )
 

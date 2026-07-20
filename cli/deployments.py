@@ -1,9 +1,8 @@
 import json
-import pprint
 
 import click
 
-from utils import parse_payload, tabulize
+from utils import parse_payload, tabulize_list, tabulize_dict
 from utils.context import get_cli_context
 from craft_ai_sdk.constants import DEPLOYMENT_MODES
 
@@ -51,7 +50,7 @@ def create(
             schedule=schedule,
         )
         click.echo(f"Deployment '{name}' created successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -66,7 +65,7 @@ def get(name: str):
     try:
         result = ctx.obj.sdk_instance.get_deployment(name)
         click.echo(f"Deployment '{name}' retrieved successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -81,7 +80,7 @@ def delete(name: str):
     try:
         result = ctx.obj.sdk_instance.delete_deployment(name)
         click.echo(f"Deployment '{name}' deleted successfully")
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
 
@@ -109,12 +108,11 @@ def list_deployments():
     # Call SDK
     try:
         result = ctx.obj.sdk_instance.list_deployments()
-        click.echo(tabulize(
+        click.echo(tabulize_list(
+            result,
             {'name': 'Name', 'pipeline_name': 'Pipeline', 'execution_rule': 'Rule', 'is_enabled': 'Enabled', 'status': 'Status'},
-            result
         ))
     except Exception as e:
-        pprint.pprint(e)
         raise click.ClickException(e) from e
 
 @deployments.command()
@@ -127,9 +125,8 @@ def rotate_endpoint_token(name: str, token: str | None):
     # Call SDK
     try:
         result = ctx.obj.sdk_instance.generate_new_endpoint_token(name, token)
-        click.echo(json.dumps(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
-        pprint.pprint(e)
         raise click.ClickException(e) from e
 
 
@@ -154,6 +151,6 @@ def trigger(name: str, payload: str | None):
     try:
         result = ctx.obj.sdk_instance.trigger_endpoint(name, inputs=parsed_payload)
         click.echo(f"Deployment '{name}' triggered successfully")
-        click.echo(f"{result!r}")
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e

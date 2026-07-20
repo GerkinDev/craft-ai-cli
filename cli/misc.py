@@ -1,7 +1,7 @@
 from pprint import pformat, pprint
 
 import click
-from utils import parse_payload as parse
+from utils import parse_payload as parse, tabulize_dict
 from utils.context import get_cli_context
 
 
@@ -24,6 +24,6 @@ def whoami():
     # Call SDK
     try:
         result = ctx.obj.sdk_instance.who_am_i()
-        click.echo(pformat(result, indent=2))
+        click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
