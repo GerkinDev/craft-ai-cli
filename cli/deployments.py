@@ -1,8 +1,9 @@
 import json
+import pprint
 
 import click
 
-from utils import parse_payload
+from utils import parse_payload, tabulize
 from utils.context import get_cli_context
 from craft_ai_sdk.constants import DEPLOYMENT_MODES
 
@@ -96,6 +97,39 @@ def logs(name: str):
         result = ctx.obj.sdk_instance.get_deployment_logs(name)
         click.echo(json.dumps(result, indent=2))
     except Exception as e:
+        raise click.ClickException(e) from e
+
+
+
+@deployments.command('list')
+def list_deployments():
+    """List deployments"""
+    ctx = get_cli_context()
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.list_deployments()
+        click.echo(tabulize(
+            {'name': 'Name', 'pipeline_name': 'Pipeline', 'execution_rule': 'Rule', 'is_enabled': 'Enabled', 'status': 'Status'},
+            result
+        ))
+    except Exception as e:
+        pprint.pprint(e)
+        raise click.ClickException(e) from e
+
+@deployments.command()
+@click.argument("name", required=True)
+@click.option("--token", type=str, help="Token to use")
+def rotate_endpoint_token(name: str, token: str | None):
+    """Update an endpoint token"""
+    ctx = get_cli_context()
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.generate_new_endpoint_token(name, token)
+        click.echo(json.dumps(result, indent=2))
+    except Exception as e:
+        pprint.pprint(e)
         raise click.ClickException(e) from e
 
 
