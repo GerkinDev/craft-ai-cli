@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Any
 
@@ -15,19 +16,24 @@ def tabulize(columns: list[str | tuple[str, str]] | dict[str, str], data: list[d
         key: len(label) for key, label in columns_normalized.items()
     }  # Minimum widths for each header
     out_data: list[dict[str, str]] = []
+
+    def serialize_data(value: Any):
+        if isinstance(value, str):
+            return value
+        elif isinstance(value, bool):
+            return 't' if value else 'f'
+        elif value is None:
+            return ''
+        elif isinstance(value, list) or isinstance(value, dict):
+            return '$'+json.dumps(value)
+        else:
+            raise TypeError(f'Unexpected value of type {type(column_value)}')
+
     for item in data:
         out_data_item = {}
         # update max lengths
         for key in columns_normalized.keys():
-            column_value = item[key]
-            if isinstance(column_value, str):
-                pass
-            elif isinstance(column_value, bool):
-                column_value = 't' if column_value else 'f'
-            elif column_value is None:
-                column_value = ''
-            else:
-                raise TypeError()
+            column_value = serialize_data(item[key])
             out_data_item[key] = column_value
             min_widths[key] = max(min_widths[key], len(strip_ansi(column_value)))
         out_data.append(out_data_item)

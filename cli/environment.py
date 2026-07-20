@@ -87,6 +87,27 @@ def health():
 
 
 @environment.command()
+def info():
+    """Get info of the environment"""
+    info = get_environment_info()
+    click.echo(
+        tabulize(
+            ["Name", "Value"],
+            [
+                {"Name": "ID", "Value": info["environment_id"]},
+                {"Name": "Status", "Value": info["environment_status"]},
+                {"Name": "Version", "Value": info["version"]},
+                {"Name": "GPU", "Value": "yes" if info["gpu_enabled"] else "no"},
+                *[
+                    {"Name": f'"{base}" tags:', "Value": tags}
+                    for base, tags in info["supported_base_images"].items()
+                ],
+            ],
+        )
+    )
+
+
+@environment.command()
 @click.argument("target", type=click.Choice(["ready", "standby"]))
 @click.option("--no-wait", is_flag=True)
 def put_on(target: str, no_wait: bool):
