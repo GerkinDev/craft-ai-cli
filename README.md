@@ -83,6 +83,7 @@ You can also use the `@<file>` to read a file and include its content as a value
 | parse-payload | Parse a payload for debugging purpose                                 |
 | pipelines     | Manage pipelines                                                      |
 | profiles      | Manage profiles containing control/orchestrator/token configurations. |
+| whoami        | Show current user info                                                |
 
 ---
 
@@ -98,6 +99,7 @@ You can also use the `@<file>` to read a file and include its content as a value
 | delete  | Delete a pipeline                         |
 | get     | Get pipeline details                      |
 | list    | Get pipelines list                        |
+| logs    | Get the logs of a pipeline                |
 | trigger | Trigger a pipeline                        |
 
 ---
@@ -141,6 +143,12 @@ You can also use the `@<file>` to read a file and include its content as a value
 
 ---
 
+##### craft-ai-cli pipelines logs [OPTIONS] NAME
+
+  Get the logs of a pipeline
+
+---
+
 ##### craft-ai-cli pipelines get [OPTIONS] NAME
 
   Get pipeline details
@@ -171,13 +179,15 @@ You can also use the `@<file>` to read a file and include its content as a value
 
 **Commands:**
 
-| Name    | Description                  |
-|---------|------------------------------|
-| create  | Create a deployment          |
-| delete  | Delete a deployment          |
-| get     | Get deployment details       |
-| logs    | Get the logs of a deployment |
-| trigger | Trigger a deployment.        |
+| Name                  | Description                  |
+|-----------------------|------------------------------|
+| create                | Create a deployment          |
+| delete                | Delete a deployment          |
+| get                   | Get deployment details       |
+| list                  | List deployments             |
+| logs                  | Get the logs of a deployment |
+| rotate-endpoint-token | Update an endpoint token     |
+| trigger               | Trigger a deployment.        |
 
 ---
 
@@ -191,7 +201,7 @@ You can also use the `@<file>` to read a file and include its content as a value
 |-----------------------------------|---------------------------------|
 | --description TEXT                | Pipeline description            |
 | --mode [elastic&#124;low-latency] |                                 |
-| --rule [periodic&#124;endpoint]   |                                 |
+| --rule [PERIODIC&#124;ENDPOINT]   |                                 |
 | --schedule TEXT                   | Cron schedule for periodic type |
 
 ---
@@ -211,6 +221,24 @@ You can also use the `@<file>` to read a file and include its content as a value
 ##### craft-ai-cli deployments logs [OPTIONS] NAME
 
   Get the logs of a deployment
+
+---
+
+##### craft-ai-cli deployments list [OPTIONS]
+
+  List deployments
+
+---
+
+##### craft-ai-cli deployments rotate-endpoint-token [OPTIONS] NAME
+
+  Update an endpoint token
+
+**Options:**
+
+| Name         | Description  |
+|--------------|--------------|
+| --token TEXT | Token to use |
 
 ---
 
@@ -234,7 +262,7 @@ You can also use the `@<file>` to read a file and include its content as a value
 
 | Name | Description                         |
 |------|-------------------------------------|
-| get  | List executions with a given filter |
+| get  | Get a single pipeline execution     |
 | list | List executions with a given filter |
 
 ---
@@ -248,12 +276,13 @@ You can also use the `@<file>` to read a file and include its content as a value
 | Name              | Description                                 |
 |-------------------|---------------------------------------------|
 | --deployment TEXT | Name of the deployment to get executions of |
+| --pipeline TEXT   | Name of the pipeline to get executions of   |
 
 ---
 
 ##### craft-ai-cli executions get [OPTIONS] EXECUTION_ID
 
-  List executions with a given filter
+  Get a single pipeline execution
 
 ---
 
@@ -365,6 +394,7 @@ Example usage: `source <(craft-ai-cli profiles export)`
 | Name   | Description                        |
 |--------|------------------------------------|
 | health | Get health of the environment      |
+| info   | Get info of the environment        |
 | put-on | Update the state of an environment |
 
 ---
@@ -372,6 +402,12 @@ Example usage: `source <(craft-ai-cli profiles export)`
 ##### craft-ai-cli environment health [OPTIONS]
 
   Get health of the environment
+
+---
+
+##### craft-ai-cli environment info [OPTIONS]
+
+  Get info of the environment
 
 ---
 
@@ -398,3 +434,9 @@ Example usage: `source <(craft-ai-cli profiles export)`
 | Name           | Description                                                                                               |
 |----------------|-----------------------------------------------------------------------------------------------------------|
 | --payload TEXT | Key-value dictionary with payload syntax. Run `<command> parse-payload` for help and testinng  [required] |
+
+---
+
+#### craft-ai-cli whoami [OPTIONS]
+
+  Show current user info
