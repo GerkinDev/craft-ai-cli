@@ -3,7 +3,7 @@ from typing import List
 import click
 import json
 
-from utils import tabulize, tabulize_list, tabulize_dict
+from utils import tabulize_list
 from utils.context import (
     PROFILE_DIR,
     PROFILE_ENV_VAR,

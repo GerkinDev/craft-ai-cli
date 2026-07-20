@@ -10,5 +10,5 @@ __all__ = [
     "tabulize",
     "ellipsize",
     "tabulize_dict",
-    "tabulize_list"
+    "tabulize_list",
 ]

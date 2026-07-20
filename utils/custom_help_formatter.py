@@ -3,7 +3,6 @@ import sys
 from typing import Any
 
 import click
-from gettext import gettext as _
 import collections.abc as cabc
 
 

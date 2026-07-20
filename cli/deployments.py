@@ -99,8 +99,7 @@ def logs(name: str):
         raise click.ClickException(e) from e
 
 
-
-@deployments.command('list')
+@deployments.command("list")
 def list_deployments():
     """List deployments"""
     ctx = get_cli_context()
@@ -108,12 +107,21 @@ def list_deployments():
     # Call SDK
     try:
         result = ctx.obj.sdk_instance.list_deployments()
-        click.echo(tabulize_list(
-            result,
-            {'name': 'Name', 'pipeline_name': 'Pipeline', 'execution_rule': 'Rule', 'is_enabled': 'Enabled', 'status': 'Status'},
-        ))
+        click.echo(
+            tabulize_list(
+                result,
+                {
+                    "name": "Name",
+                    "pipeline_name": "Pipeline",
+                    "execution_rule": "Rule",
+                    "is_enabled": "Enabled",
+                    "status": "Status",
+                },
+            )
+        )
     except Exception as e:
         raise click.ClickException(e) from e
+
 
 @deployments.command()
 @click.argument("name", required=True)

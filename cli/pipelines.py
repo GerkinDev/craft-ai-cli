@@ -1,4 +1,3 @@
-import json
 
 import click
 from craft_ai_sdk.exceptions import SdkException

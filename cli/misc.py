@@ -1,4 +1,4 @@
-from pprint import pformat, pprint
+from pprint import pprint
 
 import click
 from utils import parse_payload as parse, tabulize_dict
@@ -15,6 +15,7 @@ from utils.context import get_cli_context
 def parse_payload(payload: str):
     """Parse a payload for debugging purpose"""
     pprint(parse(payload))
+
 
 @click.command()
 def whoami():

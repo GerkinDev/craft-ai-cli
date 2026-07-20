@@ -1,5 +1,3 @@
-import json
-from pprint import pformat
 import click
 
 from utils import get_cli_context, tabulize_list, tabulize_dict
@@ -15,9 +13,7 @@ def executions():
 @click.option(
     "--deployment", type=str, help="Name of the deployment to get executions of"
 )
-@click.option(
-    "--pipeline", type=str, help="Name of the pipeline to get executions of"
-)
+@click.option("--pipeline", type=str, help="Name of the pipeline to get executions of")
 def list(deployment: str | None, pipeline: str | None):
     """List executions with a given filter"""
     ctx = get_cli_context()
