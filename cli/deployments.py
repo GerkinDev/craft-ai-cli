@@ -4,7 +4,7 @@ import click
 
 from utils import parse_payload, tabulize_list, tabulize_dict
 from utils.context import get_cli_context
-from craft_ai_sdk.constants import DEPLOYMENT_MODES
+from craft_ai_sdk import DEPLOYMENT_MODES, DEPLOYMENT_EXECUTION_RULES
 
 
 @click.group()
@@ -20,20 +20,28 @@ def deployments():
 @click.option(
     "--mode", type=click.Choice(["elastic", "low-latency"]), default="elastic"
 )
-@click.option("--rule", type=click.Choice(["periodic", "endpoint"]), default="endpoint")
+@click.option(
+    "--rule",
+    type=click.Choice(
+        [DEPLOYMENT_EXECUTION_RULES.PERIODIC, DEPLOYMENT_EXECUTION_RULES.ENDPOINT]
+    ),
+    default=DEPLOYMENT_EXECUTION_RULES.ENDPOINT,
+)
 @click.option("--schedule", type=str, help="Cron schedule for periodic type")
 def create(
     name: str,
     pipeline_name: str,
     description: str | None,
     mode: str,
-    rule: str,
+    rule: DEPLOYMENT_EXECUTION_RULES,
     schedule: str | None,
 ):
     """Create a deployment"""
     ctx = get_cli_context()
-    if rule == "periodic" and not schedule:
-        raise click.ClickException("Schedule is required for periodic rule")
+    if rule == DEPLOYMENT_EXECUTION_RULES.PERIODIC and not schedule:
+        raise click.BadOptionUsage(
+            "schedule", "`--schedule` is required for periodic rule", ctx
+        )
 
     # Call SDK
     try:
@@ -44,7 +52,6 @@ def create(
             mode={
                 "elastic": DEPLOYMENT_MODES.ELASTIC,
                 "low-latency": DEPLOYMENT_MODES.LOW_LATENCY,
-                None: None,
             }[mode],
             execution_rule=rule,
             schedule=schedule,

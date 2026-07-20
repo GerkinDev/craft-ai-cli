@@ -1,7 +1,9 @@
+import json
+from typing import cast
 
 import click
-from craft_ai_sdk.exceptions import SdkException
-from craft_ai_sdk.io import Input, Output
+from craft_ai_sdk import SdkException, Input, Output
+from craft_ai_sdk.core.pipelines import ContainerConfig
 
 from utils import get_cli_context, parse_payload, tabulize_dict, tabulize_list
 
@@ -120,17 +122,20 @@ def create(
             parsed_outputs.append(Output(name=output_name, **output_config))
 
     # Build container config
-    container_config = {
-        "local_folder": local_folder,
-        "repository_url": repository_url,
-        "repository_branch": repository_branch,
-        "repository_deploy_key": repository_deploy_key,
-        "requirements_path": requirements_path,
-        "included_folders": list(included_folder),
-        "system_dependencies": list(system_dependency),
-        "dockerfile_path": dockerfile_path,
-        "language": language,
-    }
+    container_config = cast(
+        ContainerConfig,
+        {
+            "local_folder": local_folder,
+            "repository_url": repository_url,
+            "repository_branch": repository_branch,
+            "repository_deploy_key": repository_deploy_key,
+            "requirements_path": requirements_path,
+            "included_folders": included_folder,
+            "system_dependencies": system_dependency,
+            "dockerfile_path": dockerfile_path,
+            "language": language,
+        },
+    )
 
     # Call SDK
     try:
@@ -164,6 +169,20 @@ def delete(name: str, force_deployments_deletion: bool):
         )
         click.echo(f"Pipeline '{name}' deleted successfully")
         click.echo(tabulize_dict(result))
+    except Exception as e:
+        raise click.ClickException(e) from e
+
+
+@pipelines.command()
+@click.argument("name", required=True)
+def logs(name: str):
+    """Get the logs of a pipeline"""
+    ctx = get_cli_context()
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.get_pipeline_logs(name)
+        click.echo(json.dumps(result, indent=2))
     except Exception as e:
         raise click.ClickException(e) from e
 

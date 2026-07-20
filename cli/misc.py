@@ -1,8 +1,7 @@
 from pprint import pprint
 
 import click
-from utils import parse_payload as parse, tabulize_dict
-from utils.context import get_cli_context
+from utils import parse_payload as parse, tabulize_dict, get_cli_context
 
 
 @click.command()

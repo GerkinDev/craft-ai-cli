@@ -8,6 +8,7 @@ import click
 from craft_ai_sdk import CraftAiSdk
 import requests._types as requests_types
 import requests
+from requests.auth import AuthBase
 
 PROFILE_DIR = Path.home() / ".config" / "craft-ai-cli"
 
@@ -22,7 +23,7 @@ def resolve_profile_path(profile_name: str, assert_exists: bool = True):
 PROFILE_ENV_VAR = "CRAFT_AI_CLI_PROFILE"
 
 
-class ExperimentalAuthentication(requests.auth.AuthBase):
+class ExperimentalAuthentication(AuthBase):
     def __init__(self, cli_context: "CliContextObj"):
         self._cli_context = cli_context
 
@@ -35,14 +36,14 @@ class ExperimentalAuthentication(requests.auth.AuthBase):
         new_headers = {"Authorization": f"Bearer {sdk._access_token}"}
         r.headers.update(new_headers)
 
-        def on_unauthorized(response: requests.Response, *args, **kwargs):
-            if response.status_code == 401:
-                sdk._clear_access_token()
-
         response_hooks = r.hooks.get("response", [])
-        response_hooks.append(on_unauthorized)
+        response_hooks.append(self._on_unauthorized)
         r.hooks["response"] = response_hooks
         return r
+
+    def _on_unauthorized(self, response: requests.Response):
+        if response.status_code == 401:
+            self._cli_context.sdk_instance._clear_access_token()
 
 
 class HttpWrapper:

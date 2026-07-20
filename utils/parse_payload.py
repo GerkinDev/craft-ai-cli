@@ -3,6 +3,9 @@ import re
 from typing import Any
 
 
+# Hey there, this could have been made way more crude, but I wanted to have fun with a parser. Let me have my fun.
+
+
 def parse_payload(payload_str: str) -> dict[str, Any]:
     """Parse the payload string with quoted strings, JSON, and file references.
 

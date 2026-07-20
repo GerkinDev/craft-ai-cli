@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from utils.parse_payload import (
@@ -8,7 +10,7 @@ from utils.parse_payload import (
 )
 
 
-def idfnval(val):
+def idfnval(val: Any):
     return f"{val!r}"
 
 
@@ -59,7 +61,7 @@ def test_tokenize_chars_fail(input: str):
     ],
     ids=idfnval,
 )
-def test_tokenize_json_arr(input: str, expected: list):
+def test_tokenize_json_arr(input: str, expected: list[Any]):
     assert tokenize_json_arr(ReaderWrapper(input[1:])) == expected
 
 
@@ -74,7 +76,7 @@ def test_tokenize_json_arr(input: str, expected: list):
         ('foo={"bar": 1}', {"foo": {"bar": 1}}),
         (
             'foo={"bar": true, baz:[   qux,{}   ]}',
-            {"foo": {"bar": True, "baz": ["qux", {}]}},
+            dict[str, Any]({"foo": {"bar": True, "baz": ["qux", {}]}}),
         ),
         ("foo=[1]", {"foo": [1]}),
         ("foo=1", {"foo": 1}),
@@ -83,7 +85,7 @@ def test_tokenize_json_arr(input: str, expected: list):
     ],
     ids=idfnval,
 )
-def test_parse_payload(input: str, expected: dict):
+def test_parse_payload(input: str, expected: dict[str, Any]):
     assert parse_payload(input) == expected
 
 
