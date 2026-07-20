@@ -7,7 +7,7 @@ from cli.deployments import deployments
 from cli.pipelines import pipelines
 from cli.profiles import get_default_profile, profiles
 from cli.environment import environment
-from cli.misc import parse_payload
+from cli.misc import parse_payload, whoami
 from utils import CliContextObj, get_cli_context
 from utils.context import PROFILE_ENV_VAR
 
@@ -54,3 +54,4 @@ cli.add_command(executions)
 cli.add_command(profiles)
 cli.add_command(environment)
 cli.add_command(parse_payload)
+cli.add_command(whoami)

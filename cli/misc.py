@@ -1,7 +1,8 @@
-from pprint import pprint
+from pprint import pformat, pprint
 
 import click
 from utils import parse_payload as parse
+from utils.context import get_cli_context
 
 
 @click.command()
@@ -14,3 +15,15 @@ from utils import parse_payload as parse
 def parse_payload(payload: str):
     """Parse a payload for debugging purpose"""
     pprint(parse(payload))
+
+@click.command()
+def whoami():
+    """Show current user info"""
+    ctx = get_cli_context()
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.who_am_i()
+        click.echo(pformat(result, indent=2))
+    except Exception as e:
+        raise click.ClickException(e) from e
