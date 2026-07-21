@@ -1,3 +1,5 @@
+import json
+
 import click
 
 from utils import get_cli_context, tabulize_list, tabulize_dict
@@ -52,5 +54,18 @@ def get(execution_id: str):
     try:
         result = ctx.obj.sdk_instance.get_pipeline_execution(execution_id)
         click.echo(tabulize_dict(result))
+    except Exception as e:
+        raise click.ClickException(e) from e
+
+@executions.command()
+@click.argument("name", required=True)
+def logs(name: str):
+    """Get the logs of a pipeline"""
+    ctx = get_cli_context()
+
+    # Call SDK
+    try:
+        result = ctx.obj.sdk_instance.get_pipeline_execution_logs(name)
+        click.echo(json.dumps(result, indent=2))
     except Exception as e:
         raise click.ClickException(e) from e
