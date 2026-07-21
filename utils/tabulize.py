@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, OrderedDict, Sequence
 
 
 _ansi_re = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
@@ -15,18 +15,19 @@ def tabulize_list(
     columns: list[str | tuple[str, str]] | dict[str, str] | None = None,
 ):
     if columns is None:
-        all_object_keys = set[str]()
+        all_object_keys = list[str]()
         for item in data:
-            all_object_keys = all_object_keys.union(item.keys())
+            all_object_keys.extend(item.keys())
         columns = {}
+        all_object_keys = list(OrderedDict.fromkeys(all_object_keys))
         for object_key in all_object_keys:
             spaced_key = " ".join(object_key.split("_"))
-            columns[object_key] = spaced_key[0].upper() + spaced_key[:1]
+            columns[object_key] = spaced_key[0].upper() + spaced_key[1:]
     return tabulize(columns, data)
 
 
 def tabulize_dict(data: Mapping[str, Any]):
-    return tabulize_list([{"Key": key, "Value": value} for key, value in data.items()])
+    return tabulize_list([{"Key": key, "Value": value} for key, value in data.items()], ["Key", "Value"])
 
 
 def tabulize(
