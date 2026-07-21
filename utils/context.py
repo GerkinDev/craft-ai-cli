@@ -41,7 +41,7 @@ class ExperimentalAuthentication(AuthBase):
         r.hooks["response"] = response_hooks
         return r
 
-    def _on_unauthorized(self, response: requests.Response):
+    def _on_unauthorized(self, response: requests.Response, *args, **kwargs):
         if response.status_code == 401:
             self._cli_context.sdk_instance._clear_access_token()
 
