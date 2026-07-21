@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import cast
 
 import click
@@ -22,19 +23,19 @@ def pipelines():
     type=str,
     help="Shorthand function syntax, in the form of <function-path>:<function-name>",
 )
-@click.option("--function-path", type=str, help="Path to the function file")
+@click.option("--function-path", type=str, help="Path to the function file. If using `--local-folder`, it will be resolved relative to that option.")
 @click.option("--function-name", type=str, help="Name of the function in the file")
 @click.option(
     "--language", type=str, help="Language and version (e.g., 'python:3.8-slim')"
 )
 @click.option(
-    "--requirements-path", type=click.Path(), help="Path to requirements.txt file"
+    "--requirements-path", type=click.Path(), help="Path to requirements.txt file. If using `--local-folder`, it will be resolved relative to that option."
 )
 @click.option(
     "--included-folder",
     type=click.Path(),
     multiple=True,
-    help="Add a folder/file to include (can be repeated)",
+    help="Add a folder/file to include (can be repeated). If using `--local-folder`, it will be resolved relative to that option.",
 )
 @click.option(
     "--system-dependency",
@@ -121,6 +122,11 @@ def create(
         for output_name, output_config in parse_payload(outputs).items():
             parsed_outputs.append(Output(name=output_name, **output_config))
 
+    def resolve_path(path: str):
+        if local_folder:
+            return str(Path(path).absolute().relative_to(Path(local_folder).absolute()))
+        return path
+
     # Build container config
     container_config = cast(
         ContainerConfig,
@@ -129,9 +135,9 @@ def create(
             "repository_url": repository_url,
             "repository_branch": repository_branch,
             "repository_deploy_key": repository_deploy_key,
-            "requirements_path": requirements_path,
-            "included_folders": included_folder,
-            "system_dependencies": system_dependency,
+            "requirements_path": resolve_path(requirements_path) if requirements_path else None,
+            **({"included_folders": [resolve_path(folder) for folder in included_folder]} if included_folder else {}),
+            **({"system_dependencies": system_dependency} if system_dependency else {}),
             "dockerfile_path": dockerfile_path,
             "language": language,
         },
@@ -141,7 +147,7 @@ def create(
     try:
         result = ctx.obj.sdk_instance.create_pipeline(
             pipeline_name=name,
-            function_path=function_path,
+            function_path=resolve_path(function_path),
             function_name=function_name,
             description=description,
             container_config=container_config,
@@ -150,7 +156,7 @@ def create(
             wait_for_completion=True,
         )
         click.echo(f"Pipeline '{name}' created successfully")
-        click.echo(tabulize_dict(result))
+        click.echo(tabulize_dict(result['creation_info']))
     except Exception as e:
         raise click.ClickException(e) from e
 
