@@ -2,14 +2,14 @@ import os
 
 import click
 
-from cli.executions import executions
-from cli.deployments import deployments
-from cli.pipelines import pipelines
-from cli.profiles import get_default_profile, profiles
-from cli.environment import environment
-from cli.misc import parse_payload, whoami
-from utils import CliContextObj, get_cli_context
-from utils.context import PROFILE_ENV_VAR
+from craft_ai_cli.cli.executions import executions
+from craft_ai_cli.cli.deployments import deployments
+from craft_ai_cli.cli.pipelines import pipelines
+from craft_ai_cli.cli.profiles import get_default_profile, profiles
+from craft_ai_cli.cli.environment import environment
+from craft_ai_cli.cli.misc import parse_payload, whoami
+from craft_ai_cli.utils import CliContextObj, get_cli_context
+from craft_ai_cli.utils.context import PROFILE_ENV_VAR
 
 
 @click.group(name="craft-ai-cli")

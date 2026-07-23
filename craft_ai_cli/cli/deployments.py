@@ -2,8 +2,12 @@ import json
 
 import click
 
-from utils import parse_payload, tabulize_list, tabulize_dict
-from utils.context import get_cli_context
+from craft_ai_cli.utils import (
+    parse_payload,
+    tabulize_list,
+    tabulize_dict,
+    get_cli_context,
+)
 from craft_ai_sdk import DEPLOYMENT_MODES, DEPLOYMENT_EXECUTION_RULES
 
 

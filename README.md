@@ -7,11 +7,7 @@
    ```sh
    python -m venv .venv
    source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-3. Add the following to your `rc` file (`.bashrc`/`.zshrc`)
-   ```sh
-   export PATH="$PATH:<path to clone dir>/bin"
+   pip install -e .
    ```
 
 > You can work on your custom SDK by replacing `craft_ai_sdk>=...` with `file://</path/to/your/sdk>` in <./requirements.txt>, and reinstalling

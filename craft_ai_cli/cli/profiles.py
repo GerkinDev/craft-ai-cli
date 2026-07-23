@@ -3,11 +3,10 @@ from typing import List
 import click
 import json
 
-from utils import tabulize_list
-from utils.context import (
+from craft_ai_cli.utils import tabulize_list, get_cli_context
+from craft_ai_cli.utils.context import (
     PROFILE_DIR,
     PROFILE_ENV_VAR,
-    get_cli_context,
     resolve_profile_path,
 )
 

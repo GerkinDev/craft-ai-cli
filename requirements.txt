@@ -1,2 +1,0 @@
-click >= 8.4.1
-craft-ai-sdk >= 0.73.8

@@ -2,7 +2,7 @@ import json
 
 import click
 
-from utils import get_cli_context, tabulize_list, tabulize_dict
+from craft_ai_cli.utils import get_cli_context, tabulize_list, tabulize_dict
 
 
 @click.group()
@@ -56,6 +56,7 @@ def get(execution_id: str):
         click.echo(tabulize_dict(result))
     except Exception as e:
         raise click.ClickException(e) from e
+
 
 @executions.command()
 @click.argument("name", required=True)

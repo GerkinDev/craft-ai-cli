@@ -27,7 +27,9 @@ def tabulize_list(
 
 
 def tabulize_dict(data: Mapping[str, Any]):
-    return tabulize_list([{"Key": key, "Value": value} for key, value in data.items()], ["Key", "Value"])
+    return tabulize_list(
+        [{"Key": key, "Value": value} for key, value in data.items()], ["Key", "Value"]
+    )
 
 
 def tabulize(

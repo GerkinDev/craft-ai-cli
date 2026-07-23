@@ -2,8 +2,8 @@ from pathlib import Path
 
 import click
 
-from cli.craft_ai_cli import cli
-from utils.custom_help_formatter import CustomHelpFormatter
+from craft_ai_cli.cli.craft_ai_cli import cli
+from craft_ai_cli.utils.custom_help_formatter import CustomHelpFormatter
 
 
 def recursive_help(

@@ -6,7 +6,7 @@ from typing import Any, Literal, TypedDict, cast
 import click
 import requests
 
-from utils import get_cli_context, tabulize_list, ellipsize
+from craft_ai_cli.utils import get_cli_context, tabulize_list, ellipsize
 
 
 @click.group()

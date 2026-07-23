@@ -6,7 +6,12 @@ import click
 from craft_ai_sdk import SdkException, Input, Output
 from craft_ai_sdk.core.pipelines import ContainerConfig
 
-from utils import get_cli_context, parse_payload, tabulize_dict, tabulize_list
+from craft_ai_cli.utils import (
+    get_cli_context,
+    tabulize_dict,
+    tabulize_list,
+    parse_payload,
+)
 
 
 @click.group()
@@ -23,13 +28,19 @@ def pipelines():
     type=str,
     help="Shorthand function syntax, in the form of <function-path>:<function-name>",
 )
-@click.option("--function-path", type=str, help="Path to the function file. If using `--local-folder`, it will be resolved relative to that option.")
+@click.option(
+    "--function-path",
+    type=str,
+    help="Path to the function file. If using `--local-folder`, it will be resolved relative to that option.",
+)
 @click.option("--function-name", type=str, help="Name of the function in the file")
 @click.option(
     "--language", type=str, help="Language and version (e.g., 'python:3.8-slim')"
 )
 @click.option(
-    "--requirements-path", type=click.Path(), help="Path to requirements.txt file. If using `--local-folder`, it will be resolved relative to that option."
+    "--requirements-path",
+    type=click.Path(),
+    help="Path to requirements.txt file. If using `--local-folder`, it will be resolved relative to that option.",
 )
 @click.option(
     "--included-folder",
@@ -135,8 +146,18 @@ def create(
             "repository_url": repository_url,
             "repository_branch": repository_branch,
             "repository_deploy_key": repository_deploy_key,
-            "requirements_path": resolve_path(requirements_path) if requirements_path else None,
-            **({"included_folders": [resolve_path(folder) for folder in included_folder]} if included_folder else {}),
+            "requirements_path": resolve_path(requirements_path)
+            if requirements_path
+            else None,
+            **(
+                {
+                    "included_folders": [
+                        resolve_path(folder) for folder in included_folder
+                    ]
+                }
+                if included_folder
+                else {}
+            ),
             **({"system_dependencies": system_dependency} if system_dependency else {}),
             "dockerfile_path": dockerfile_path,
             "language": language,
@@ -156,7 +177,7 @@ def create(
             wait_for_completion=True,
         )
         click.echo(f"Pipeline '{name}' created successfully")
-        click.echo(tabulize_dict(result['creation_info']))
+        click.echo(tabulize_dict(result["creation_info"]))
     except Exception as e:
         raise click.ClickException(e) from e
 

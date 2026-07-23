@@ -1,7 +1,7 @@
 from pprint import pprint
 
 import click
-from utils import parse_payload as parse, tabulize_dict, get_cli_context
+from craft_ai_cli.utils import get_cli_context, tabulize_dict, parse_payload as parse
 
 
 @click.command()

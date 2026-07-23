@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from utils.parse_payload import (
+from craft_ai_cli.utils.parse_payload import (
     ReaderWrapper,
     parse_payload,
     tokenize_json_arr,

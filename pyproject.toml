@@ -1,0 +1,22 @@
+[project]
+name = "craft-ai-cli"
+version = "0.0.1"
+description = "Non official Craft AI CLI"
+requires-python = ">=3.11"
+dependencies = [
+    "click >= 8.4.1",
+    "craft_ai_sdk >= 0.74.0"
+]
+
+[project.scripts]
+craft-ai-cli = "craft_ai_cli.cli.craft_ai_cli:cli"
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
+
+[dependency-groups]
+dev = [
+    "pytest >= 9.1.1",
+    "pytest-watch >= 4.2.0"
+]
