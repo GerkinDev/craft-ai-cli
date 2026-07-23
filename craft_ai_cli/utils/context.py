@@ -51,7 +51,7 @@ class HttpWrapper:
         self,
         cli_context: "CliContextObj",
         base_url: str,
-        extra_kwargs: requests_types.BaseRequestKwargs | None = None,
+        extra_kwargs: "requests_types.BaseRequestKwargs | None" = None,
     ):
         self._cli_context = cli_context
         self._base_url = base_url
@@ -59,11 +59,11 @@ class HttpWrapper:
 
     def get(
         self,
-        url: requests_types.UriType,
-        params: requests_types.ParamsType = None,
+        url: "requests_types.UriType",
+        params: "requests_types.ParamsType" = None,
         *,
         raise_for_status: bool = True,
-        **kwargs: Unpack[requests_types.GetKwargs],
+        **kwargs: Unpack["requests_types.GetKwargs"],
     ) -> requests.Response:
         response = self._cli_context.sdk_instance._session.get(
             f"{self._base_url}{url}",
@@ -76,11 +76,11 @@ class HttpWrapper:
 
     def patch(
         self,
-        url: requests_types.UriType,
-        data: requests_types.DataType = None,
+        url: "requests_types.UriType",
+        data: "requests_types.DataType" = None,
         *,
         raise_for_status: bool = True,
-        **kwargs: Unpack[requests_types.DataKwargs],
+        **kwargs: Unpack["requests_types.DataKwargs"],
     ) -> requests.Response:
         response = self._cli_context.sdk_instance._session.patch(
             f"{self._base_url}{url}",

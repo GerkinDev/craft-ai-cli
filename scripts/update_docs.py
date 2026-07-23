@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Generator
 
 import click
 
@@ -8,7 +9,7 @@ from craft_ai_cli.utils.custom_help_formatter import CustomHelpFormatter
 
 def recursive_help(
     cmd: click.Group, parent: click.Context | None = None, depth: int = 0
-):
+) -> Generator[str, None, None]:
     ctx = click.core.Context(cmd, info_name=cmd.name, parent=parent)
     formatter = CustomHelpFormatter(depth + 1)
     cmd.add_help_option = False
@@ -21,14 +22,19 @@ def recursive_help(
             yield sub_help
 
 
-root = Path(__file__).parent
-with open(root / "README.md", "r") as f:
-    readme = f.read()
+def generate_help():
+    root = Path(__file__).parent / ".."
+    with open(root / "README.md", "r") as f:
+        readme = f.read()
 
-DOCS_SECTION = "## Full documentation"
-readme = readme.split(DOCS_SECTION)[0] + DOCS_SECTION + "\n\n"
+    DOCS_SECTION = "## Full documentation"
+    readme = readme.split(DOCS_SECTION)[0] + DOCS_SECTION + "\n\n"
 
-readme = readme + "\n---\n\n".join(list(recursive_help(cli, None, 2)))
+    readme = readme + "\n---\n\n".join(list(recursive_help(cli, None, 2)))
 
-with open(root / "README.md", "w") as f:
-    f.write(readme)
+    with open(root / "README.md", "w") as f:
+        f.write(readme)
+
+
+if __name__ == "__main__":
+    generate_help()

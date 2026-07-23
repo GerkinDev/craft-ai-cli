@@ -110,11 +110,11 @@ You can also use the `@<file>` to read a file and include its content as a value
 |------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
 | --description TEXT           | Pipeline description                                                                                                             |
 | --function TEXT              | Shorthand function syntax, in the form of <function-path>:<function-name>                                                        |
-| --function-path TEXT         | Path to the function file                                                                                                        |
+| --function-path TEXT         | Path to the function file. If using `--local-folder`, it will be resolved relative to that option.                               |
 | --function-name TEXT         | Name of the function in the file                                                                                                 |
 | --language TEXT              | Language and version (e.g., 'python:3.8-slim')                                                                                   |
-| --requirements-path PATH     | Path to requirements.txt file                                                                                                    |
-| --included-folder PATH       | Add a folder/file to include (can be repeated)                                                                                   |
+| --requirements-path PATH     | Path to requirements.txt file. If using `--local-folder`, it will be resolved relative to that option.                           |
+| --included-folder PATH       | Add a folder/file to include (can be repeated). If using `--local-folder`, it will be resolved relative to that option.          |
 | --system-dependency TEXT     | Add a system dependency (can be repeated)                                                                                        |
 | --dockerfile-path PATH       | Path to Dockerfile                                                                                                               |
 | --repository-url TEXT        | Remote repository URL                                                                                                            |
@@ -260,6 +260,7 @@ You can also use the `@<file>` to read a file and include its content as a value
 |------|-------------------------------------|
 | get  | Get a single pipeline execution     |
 | list | List executions with a given filter |
+| logs | Get the logs of a pipeline          |
 
 ---
 
@@ -279,6 +280,12 @@ You can also use the `@<file>` to read a file and include its content as a value
 ##### craft-ai-cli executions get [OPTIONS] EXECUTION_ID
 
   Get a single pipeline execution
+
+---
+
+##### craft-ai-cli executions logs [OPTIONS] NAME
+
+  Get the logs of a pipeline
 
 ---
 
